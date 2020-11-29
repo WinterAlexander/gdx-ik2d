@@ -8,4 +8,6 @@ target/
 
 BUILD/
 RELEASE/
+.idea/
+*.iml
 
