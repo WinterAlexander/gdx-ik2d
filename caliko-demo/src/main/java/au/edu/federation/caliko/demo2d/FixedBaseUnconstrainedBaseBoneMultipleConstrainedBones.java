@@ -4,7 +4,6 @@ import au.edu.federation.caliko.FabrikBone2D;
 import au.edu.federation.caliko.FabrikChain2D;
 import au.edu.federation.caliko.FabrikStructure2D;
 import au.edu.federation.utils.Mat4f;
-import au.edu.federation.utils.Vec2f;
 
 /**
  * @author jsalvo
@@ -20,17 +19,17 @@ public class FixedBaseUnconstrainedBaseBoneMultipleConstrainedBones extends Cali
 		FabrikChain2D chain = new FabrikChain2D();
 		
 		// Create the base bone and add it to the chain
-		FabrikBone2D baseBone = new FabrikBone2D( new Vec2f(), new Vec2f(1.0f, 0.0f), 10.0f);
+		FabrikBone2D baseBone = new FabrikBone2D( new Vector2(), new Vector2(1.0f, 0.0f), 10.0f);
 		chain.addBone(baseBone);
 		
 		// Add a series of additional bones 
 		float boneLength = 10.0f;
-		Vec2f defaultUV  = new Vec2f(1.0f, 0.0f);
+		Vector2 defaultUV  = new Vector2(1.0f, 0.0f);
 		int numBones = 15;
 		for (int loop = 0; loop < numBones; loop++)
 		{
 			// Each bone added will be rotated 10 degrees further than the last
-			Vec2f rotatedUV = Vec2f.rotateDegs(defaultUV, (float)loop * numBones);
+			Vector2 rotatedUV = Vec2f.rotateDegs(defaultUV, (float)loop * numBones);
 			
 			// Constrained
 			chain.addConsecutiveConstrainedBone(rotatedUV, boneLength, 60.0f, 60.0f);

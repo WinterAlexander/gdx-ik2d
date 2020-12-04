@@ -1,5 +1,8 @@
 package au.edu.federation.utils;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -155,10 +158,10 @@ public final class Utils
 	 * If the direction unit vector has a magnitude of zero then an IllegalArgumentException is thrown.
 	 * @param	directionUV	The direction unit vector to validate
 	 */
-	public static void validateDirectionUV(Vec2f directionUV)
+	public static void validateDirectionUV(Vector2 directionUV)
 	{
 		// Ensure that the magnitude of this direction unit vector is greater than zero
-		if ( directionUV.length() <= 0.0f )
+		if ( directionUV.len2() <= 0.0f )
 		{
 			throw new IllegalArgumentException("Vec2f direction unit vector cannot be zero.");
 		}
@@ -170,10 +173,10 @@ public final class Utils
 	 * If the direction unit vector has a magnitude of zero then an IllegalArgumentException is thrown.
 	 * @param	directionUV	The direction unit vector to validate
 	 */
-	public static void validateDirectionUV(Vec3f directionUV)
+	public static void validateDirectionUV(Vector3 directionUV)
 	{
 		// Ensure that the magnitude of this direction unit vector is greater than zero
-		if ( directionUV.length() <= 0.0f )
+		if ( directionUV.len2() <= 0.0f )
 		{
 			throw new IllegalArgumentException("Vec3f direction unit vector cannot be zero.");
 		}

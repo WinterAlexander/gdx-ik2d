@@ -6,7 +6,6 @@ import au.edu.federation.caliko.FabrikChain2D;
 import au.edu.federation.caliko.FabrikStructure2D;
 import au.edu.federation.utils.Mat4f;
 import au.edu.federation.utils.Utils;
-import au.edu.federation.utils.Vec2f;
 
 /**
  * @author jsalvo

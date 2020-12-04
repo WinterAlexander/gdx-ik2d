@@ -7,7 +7,6 @@ import au.edu.federation.caliko.FabrikJoint3D.JointType;
 import au.edu.federation.utils.Colour4f;
 import au.edu.federation.utils.Mat4f;
 import au.edu.federation.utils.Utils;
-import au.edu.federation.utils.Vec3f;
 
 /**
  * @author jsalvo

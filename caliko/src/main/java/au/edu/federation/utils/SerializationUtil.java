@@ -117,7 +117,7 @@ public class SerializationUtil
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static <T extends FabrikStructure> T unserializeStructure(final InputStream is, Class<T> clazz) throws Exception
 	{		
-		T structure = null;		
+		T structure = null;
 		ObjectInputStream ois = null;
 		try
 		{

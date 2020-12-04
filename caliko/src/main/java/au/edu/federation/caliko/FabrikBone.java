@@ -1,6 +1,6 @@
 package au.edu.federation.caliko;
 
-import au.edu.federation.utils.Vectorf;
+import com.badlogic.gdx.math.Vector;
 
 /**
  * Interface for a bone
@@ -8,7 +8,7 @@ import au.edu.federation.utils.Vectorf;
  * @author jsalvo
  */
 @SuppressWarnings("rawtypes")
-public interface FabrikBone<V extends Vectorf, J extends FabrikJoint> {
+public interface FabrikBone<V extends Vector, J extends FabrikJoint> {
 	
 	/**
 	 * Return the start location of this bone.

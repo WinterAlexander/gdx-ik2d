@@ -1,7 +1,5 @@
 package au.edu.federation.caliko.demo;
 
-import au.edu.federation.utils.Vec3f;
-
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 

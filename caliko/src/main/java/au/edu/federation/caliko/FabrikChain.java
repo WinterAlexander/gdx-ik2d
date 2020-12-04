@@ -3,10 +3,11 @@ package au.edu.federation.caliko;
 import java.util.List;
 
 import au.edu.federation.utils.Vectorf;
+import com.badlogic.gdx.math.Vector;
 
 @SuppressWarnings("rawtypes")
-public interface FabrikChain<B extends FabrikBone<V,J>, V extends Vectorf, J extends FabrikJoint, C extends BaseboneConstraintType> {
-	
+public interface FabrikChain<B extends FabrikBone<V, J>, V extends Vector, J extends FabrikJoint, C extends BaseboneConstraintType>
+{
 	/**
 	 * Add a bone to the end of this IK chain of this chain.
 	 * <p>

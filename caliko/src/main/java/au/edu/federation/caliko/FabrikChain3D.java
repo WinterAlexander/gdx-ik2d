@@ -10,8 +10,7 @@ import au.edu.federation.caliko.FabrikJoint3D.JointType;
 import au.edu.federation.utils.Colour4f;
 import au.edu.federation.utils.Mat3f;
 import au.edu.federation.utils.Utils;
-import au.edu.federation.utils.Vec2f;
-import au.edu.federation.utils.Vec3f;
+import com.badlogic.gdx.math.Vector3;
 
 /** Class to represent a 3D Inverse Kinematics (IK) chain that can be solved for a given target using the FABRIK algorithm.
  * <p>
@@ -22,7 +21,7 @@ import au.edu.federation.utils.Vec3f;
  * @version 0.5.3 - 19/06/2019
  */
 
-public class FabrikChain3D implements FabrikChain<FabrikBone3D, Vec3f, FabrikJoint3D, BaseboneConstraintType3D>, Serializable
+public class FabrikChain3D implements FabrikChain<FabrikBone3D, Vector3, FabrikJoint3D, BaseboneConstraintType3D>, Serializable
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -73,7 +72,7 @@ public class FabrikChain3D implements FabrikChain<FabrikBone3D, Vec3f, FabrikJoi
 	 * hence increased processing time to solve a given IK chain.
 	 * <p>	
 	 * Although this property is the main criteria used to establish whether or not we have solved a given IK chain, it works
-	 * in combination with the {@link #mMaxIterationAttempts} and {@link mMinIterationChange} fields to improve the
+	 * in combination with the {@link #mMaxIterationAttempts} and {@link #mMinIterationChange} fields to improve the
 	 * performance of the algorithm in situations where we may not be able to solve a given IK chain. Such situations may arise
 	 * when bones in the chain are highly constrained, or when the target is further away than the length of a chain which has
 	 * a fixed base location.
@@ -126,7 +125,7 @@ public class FabrikChain3D implements FabrikChain<FabrikBone3D, Vec3f, FabrikJoi
 	 * <p>
 	 * See {@link #setFixedBaseMode(boolean)}
 	 */	
-	private Vec3f mFixedBaseLocation = new Vec3f();
+	private Vector3 mFixedBaseLocation = new Vector3();
 
 	/** mFixedBaseMode	Whether this FabrikChain3D has a fixed (i.e. immovable) base location.
 	 *
@@ -150,32 +149,32 @@ public class FabrikChain3D implements FabrikChain<FabrikBone3D, Vec3f, FabrikJoi
 	
 	/** mBaseboneConstraintUV	The direction around which we should constrain the basebone.
 	 * <p>
-	 * To ensure correct operation, the provided Vec3f is normalised inside the {@link #setBaseboneConstraintUV(Vec3f)} method. Passing a Vec3f
+	 * To ensure correct operation, the provided Vec3f is normalised inside the {@link #setBaseboneConstraintUV(Vector3)} method. Passing a Vec3f
 	 * with a magnitude of zero will result in the constraint not being set.
 	 */
-	private Vec3f mBaseboneConstraintUV = new Vec3f();
+	private Vector3 mBaseboneConstraintUV = new Vector3();
 	
 	/**
 	 * mBaseboneRelativeConstraintUV	The basebone direction constraint in the coordinate space of the bone in another chain
 	 * that this chain is connected to.
 	 */
-	private Vec3f mBaseboneRelativeConstraintUV = new Vec3f();
+	private Vector3 mBaseboneRelativeConstraintUV = new Vector3();
 	
 	/**
 	 * mBaseboneRelativeReferenceConstraintUV	The basebone reference constraint in the coordinate space of the bone in another chain
 	 * that this chain is connected to.
 	 */
-	private Vec3f mBaseboneRelativeReferenceConstraintUV = new Vec3f();
+	private Vector3 mBaseboneRelativeReferenceConstraintUV = new Vector3();
 	
 	/**
 	 * mTargetlastLocation	The last target location for the end effector of this IK chain.
 	 * <p>
-	 * The target location can be updated via the {@link #solveForTarget(Vec3f)} or {@link #solveForTarget(float, float, float)} methods, which in turn
+	 * The target location can be updated via the {@link #solveForTarget(Vector3)} or {@link #solveForTarget(float, float, float)} methods, which in turn
 	 * will call the solveIK(Vec3f) method to attempt to solve the IK chain, resulting in an updated chain configuration.
 	 * <p>
 	 * The default is Vec3f(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE)
 	 */
-	private Vec3f mLastTargetLocation = new Vec3f(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
+	private Vector3 mLastTargetLocation = new Vector3(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
 	
 	/**
 	 * The width in pixels of the line used to draw constraints for this chain.
@@ -198,13 +197,13 @@ public class FabrikChain3D implements FabrikChain<FabrikBone3D, Vec3f, FabrikJoi
 	 * <p>
 	 * See {@link #setFixedBaseMode(boolean)}
 	 */	
-	private Vec3f mLastBaseLocation = new Vec3f(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
+	private Vector3 mLastBaseLocation = new Vector3(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
 
 	/**
 	 * mCurrentSolveDistance	The current distance between the end effector and the target location for this IK chain.
 	 * <p>
 	 * The current solve distance is updated when an attempt is made to solve the IK chain as triggered by a call to the
-	 * {@link #solveForTarget(Vec3f)} or (@link #solveForTarget(float, float, float) methods.
+	 * {@link #solveForTarget(Vector3)} or (@link #solveForTarget(float, float, float) methods.
 	 */
 	private float mCurrentSolveDistance = Float.MAX_VALUE;
 	
@@ -235,7 +234,7 @@ public class FabrikChain3D implements FabrikChain<FabrikBone3D, Vec3f, FabrikJoi
 	 * 
 	 * See (@link #setEmbeddedTargetMode(boolean) }
 	 */
-	private Vec3f mEmbeddedTarget = new Vec3f();
+	private Vector3 mEmbeddedTarget = new Vector3();
 	
 	/**
 	 * mUseEmbeddedTarget	Whether or not to use the mEmbeddedTarget location when solving this chain.
@@ -409,7 +408,7 @@ public class FabrikChain3D implements FabrikChain<FabrikBone3D, Vec3f, FabrikJoi
 	public void addConsecutiveBone(FabrikBone3D bone)
 	{
 		// Validate the direction unit vector - throws an IllegalArgumentException if it has a magnitude of zero
-		Vec3f dir = bone.getDirectionUV();
+		Vector3 dir = bone.getDirectionUV();
 		Utils.validateDirectionUV(dir);
 		
 		// Validate the length of the bone - throws an IllegalArgumentException if it is not a positive value
@@ -420,7 +419,7 @@ public class FabrikChain3D implements FabrikChain<FabrikBone3D, Vec3f, FabrikJoi
 		if (!this.mChain.isEmpty())
 		{		
 			// Get the end location of the last bone, which will be used as the start location of the new bone
-			Vec3f prevBoneEnd = mChain.get(this.mChain.size()-1).getEndLocation();
+			Vector3 prevBoneEnd = mChain.get(this.mChain.size()-1).getEndLocation();
 						
 			bone.setStartLocation(prevBoneEnd);
 			bone.setEndLocation( prevBoneEnd.plus( dir.times(len)) );
@@ -452,7 +451,7 @@ public class FabrikChain3D implements FabrikChain<FabrikBone3D, Vec3f, FabrikJoi
 	 * @param	jointType			The type of hinge joint to be used - either JointType.LOCAL or JointType.GLOBAL.
 	 * @param	hingeRotationAxis	The axis about which the hinge joint freely rotates.
 	 */
-	public void addConsecutiveFreelyRotatingHingedBone(Vec3f directionUV, float length, JointType jointType, Vec3f hingeRotationAxis)
+	public void addConsecutiveFreelyRotatingHingedBone(Vector3 directionUV, float length, JointType jointType, Vector3 hingeRotationAxis)
 	{
 		// Because we aren't constraining this bone to a reference axis within the hinge rotation axis we don't care about the hinge constraint
 		// reference axis (7th param) so we'll just generate an axis perpendicular to the hinge rotation axis and use that.
@@ -478,7 +477,7 @@ public class FabrikChain3D implements FabrikChain<FabrikBone3D, Vec3f, FabrikJoi
 	 * @param	hingeRotationAxis	The axis about which the hinge joint freely rotates.
 	 * @param	colour				The colour to draw the bone.
 	 */
-	public void addConsecutiveFreelyRotatingHingedBone(Vec3f directionUV, float length, JointType jointType, Vec3f hingeRotationAxis, Colour4f colour)
+	public void addConsecutiveFreelyRotatingHingedBone(Vector3 directionUV, float length, JointType jointType, Vector3 hingeRotationAxis, Colour4f colour)
 	{
 		// Because we aren't constraining this bone to a reference axis within the hinge rotation axis we don't care about the hinge constraint
 		// reference axis (7th param) so we'll just generate an axis perpendicular to the hinge rotation axis and use that.
@@ -1315,7 +1314,7 @@ public class FabrikChain3D implements FabrikChain<FabrikBone3D, Vec3f, FabrikJoi
 	 * @return	float		The resulting distance between the end effector and the new target location after solving the IK chain.
 	 */
 	@Override
-	public float solveForTarget(Vec3f newTarget)
+	public float solveForTarget(Vector3 newTarget)
 	{	
 		// If we have both the same target and base location as the last run then do not solve
 		if ( mLastTargetLocation.approximatelyEquals(newTarget, 0.001f) &&
@@ -1851,7 +1850,7 @@ public class FabrikChain3D implements FabrikChain<FabrikBone3D, Vec3f, FabrikJoi
 		*/
 		
 		// Finally, calculate and return the distance between the current effector location and the target.
-		return Vec3f.distanceBetween(mChain.get(mChain.size()-1).getEndLocation(), target);
+		return mChain.get(mChain.size() - 1).getEndLocation().dst(target);
 	}
 	
 	/***
@@ -1889,7 +1888,7 @@ public class FabrikChain3D implements FabrikChain<FabrikBone3D, Vec3f, FabrikJoi
 	 * @param newEmbeddedTarget	The location of the embedded target.
 	 */
 	@Override
-	public void updateEmbeddedTarget(Vec3f newEmbeddedTarget)
+	public void updateEmbeddedTarget(Vector3 newEmbeddedTarget)
 	{
 		// Using embedded target mode? Overwrite embedded target with provided location
 		if (mUseEmbeddedTarget) { 
@@ -1915,7 +1914,7 @@ public class FabrikChain3D implements FabrikChain<FabrikBone3D, Vec3f, FabrikJoi
 	{
 		// Using embedded target mode? Overwrite embedded target with provided location
 		if (mUseEmbeddedTarget) { 
-		  mEmbeddedTarget.set( new Vec3f(x, y, z) ); 
+		  mEmbeddedTarget.set( new Vector3(x, y, z) );
 		}
 		else { 
 		  throw new RuntimeException("This chain does not have embedded targets enabled - enable with setEmbeddedTargetMode(true)."); 

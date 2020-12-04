@@ -1,5 +1,7 @@
 package au.edu.federation.utils;
 
+import com.badlogic.gdx.graphics.Color;
+
 import java.io.Serializable;
 
 
@@ -14,7 +16,7 @@ import java.io.Serializable;
  * @author Al Lansley
  * @version 1.0 - 20/06/2019
  */
-public class Colour4f implements Serializable
+public class Colour4f extends Color implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
@@ -25,18 +27,6 @@ public class Colour4f implements Serializable
 
 	/** The maximum valid value of any colour component. */
 	private static final float MAX_COMPONENT_VALUE = 1.0f;
-
-	/** Red component. Publicly accessible. */
-	public float r;
-
-	/** Green component. Publicly accessible. */
-	public float g;
-
-	/** Blue component. Publicly accessible. */
-	public float b;
-
-	/** Alpha (transparency) component. Publicly accessible. */
-	public float a;
 
 	// ---------- Constructors ----------
 
@@ -87,41 +77,6 @@ public class Colour4f implements Serializable
 	 * @param   alpha	The alpha component of this colour.
 	 */
 	public Colour4f(float red, float green, float blue, float alpha)
-	{
-		this.r = Colour4f.clamp(red);
-		this.g = Colour4f.clamp(green);
-		this.b = Colour4f.clamp(blue);
-		this.a = Colour4f.clamp(alpha);
-	}
-
-	// ---------- Public Methods ----------
-
-	/**
-	 * Set the RGBA values of this Colour4f object from a source Colour4f object.
-	 * <p>
-	 * Source values are clamped to the range 0.0f..1.0f.
-	 *
-	 * @param   source 	The source colour to set the values of this colour to.
-	 */
-	public void set(Colour4f source)
-	{
-		this.r = Colour4f.clamp(source.r);
-		this.g = Colour4f.clamp(source.g);
-		this.b = Colour4f.clamp(source.b);
-		this.a = Colour4f.clamp(source.a);
-	}
-
-	/**
-	 * Set the RGBA values of this Colour4f object from a red, green, blue and alpha value.
-	 * <p>
-	 * Any values outside the range 0.0f..1.0f are clamped to the nearest valid value.
-	 * <p>
-	 * @param   red		(float) The red   component to set for this colour.
-	 * @param   green	(float) The green component to set for this colour.
-	 * @param   blue	(float) The blue  component to set for this colour.
-	 * @param   alpha	(float) The alpha component to set for this colour.
-	 */
-	public void set(final float red, final float green, final float blue, final float alpha)
 	{
 		this.r = Colour4f.clamp(red);
 		this.g = Colour4f.clamp(green);
@@ -215,42 +170,4 @@ public class Colour4f implements Serializable
 		else if (componentValue < MIN_COMPONENT_VALUE) { return MIN_COMPONENT_VALUE; }
 		else    { return componentValue; }
 	}
-
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + Float.floatToIntBits(a);
-    result = prime * result + Float.floatToIntBits(b);
-    result = prime * result + Float.floatToIntBits(g);
-    result = prime * result + Float.floatToIntBits(r);
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    Colour4f other = (Colour4f) obj;
-    if (Float.floatToIntBits(a) != Float.floatToIntBits(other.a)) {
-      return false;
-    }
-    if (Float.floatToIntBits(b) != Float.floatToIntBits(other.b)) {
-      return false;
-    }
-    if (Float.floatToIntBits(g) != Float.floatToIntBits(other.g)) {
-      return false;
-    }
-    if (Float.floatToIntBits(r) != Float.floatToIntBits(other.r)) {
-      return false;
-    }
-    return true;
-  }
 }

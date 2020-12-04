@@ -7,7 +7,6 @@ import java.util.List;
 
 import au.edu.federation.caliko.FabrikChain2D.BaseboneConstraintType2D;
 import au.edu.federation.utils.Utils;
-import au.edu.federation.utils.Vec2f;
 
 /** 
  * A FabrikStructure2D contains one or more FabrikChain2D objects, which we can solve using the FABRIK (Forward And

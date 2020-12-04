@@ -3,7 +3,7 @@ package au.edu.federation.caliko;
 import au.edu.federation.utils.Colour4f;
 import au.edu.federation.utils.Mat4f;
 import au.edu.federation.utils.Utils;
-import au.edu.federation.utils.Vec2f;
+import com.badlogic.gdx.math.Vector2;
 
 /**
  * A class to represent a FabrikBone2D object.
@@ -16,7 +16,7 @@ import au.edu.federation.utils.Vec2f;
  * @version 0.9.2 - 19/06/2019
  */
 
-public class FabrikBone2D implements FabrikBone<Vec2f,FabrikJoint2D>
+public class FabrikBone2D implements FabrikBone<Vector2, FabrikJoint2D>
 {
 	/**
 	 * mJoint	The joint attached to this FabrikBone2D.
@@ -44,7 +44,7 @@ public class FabrikBone2D implements FabrikBone<Vec2f,FabrikJoint2D>
 	 * The start location of a bone may only be set through a constructor or via an 'addBone'
 	 * or 'addConsecutiveBone' method provided by the {@link FabrikChain2D} class.
 	 */
-	private Vec2f mStartLocation = new Vec2f();
+	private Vector2 mStartLocation = new Vector2();
 
 	/**
 	 * mEndLocation	The end location of this FabrikBone2D object.
@@ -52,7 +52,7 @@ public class FabrikBone2D implements FabrikBone<Vec2f,FabrikJoint2D>
 	 * The end location of a bone may only be set through a constructor or indirectly via an
 	 * 'addBone' method provided by the {@link FabrikChain2D} class.
 	 */
-	private Vec2f mEndLocation = new Vec2f();
+	private Vector2 mEndLocation = new Vector2();
 
 	/**
 	 * mName	The name of this FabrikBone2D object.
@@ -70,7 +70,7 @@ public class FabrikBone2D implements FabrikBone<Vec2f,FabrikJoint2D>
 	 * In the typical usage scenario of a FabrikBone2D the length of the bone remains constant.
 	 * <p>
 	 * The length may be set explicitly through a value provided to a constructor, or implicitly
-	 * when it is calculated as the distance between the {@link #mStartLocation} and {@link mEndLocation}
+	 * when it is calculated as the distance between the {@link #mStartLocation} and {@link #mEndLocation}
 	 * of a bone.
 	 * <p>
 	 * Attempting to set a bone length of less than zero, either explicitly or implicitly, will result
@@ -81,7 +81,7 @@ public class FabrikBone2D implements FabrikBone<Vec2f,FabrikJoint2D>
     /**
 	 * mGlobalConstraintUV	The world-space constraint unit-vector of this 2D bone.
 	 */
-	private Vec2f mGlobalConstraintUV = new Vec2f(1.0f, 0.0f);
+	private Vector2 mGlobalConstraintUV = new Vector2(1.0f, 0.0f);
 
 	/**
 	 * The colour used to draw the bone.
@@ -124,11 +124,11 @@ public class FabrikBone2D implements FabrikBone<Vec2f,FabrikJoint2D>
 	 * @param	startLocation	The start location of the bone in world space.
 	 * @param	endLocation		The end location of the bone in world space.
 	 */
-	public FabrikBone2D(Vec2f startLocation, Vec2f endLocation)
+	public FabrikBone2D(Vector2 startLocation, Vector2 endLocation)
 	{
 		mStartLocation.set(startLocation);
 		mEndLocation.set(endLocation);
-		setLength( Vec2f.distanceBetween(startLocation, endLocation) );
+		setLength(startLocation.dst(endLocation));
 	}
 
 	/**
@@ -147,7 +147,7 @@ public class FabrikBone2D implements FabrikBone<Vec2f,FabrikJoint2D>
 	 */
 	public FabrikBone2D(float startX, float startY, float endX, float endY)
 	{
-		this( new Vec2f(startX, startY), new Vec2f(endX, endY) );
+		this(new Vector2(startX, startY), new Vector2(endX, endY));
 	}
 
 	/**
@@ -164,14 +164,14 @@ public class FabrikBone2D implements FabrikBone<Vec2f,FabrikJoint2D>
 	 * @param	directionUV		The direction unit vector of the bone in world-space.
 	 * @param	length			The length of the bone in world-space units.
 	 */
-	public FabrikBone2D(Vec2f startLocation, Vec2f directionUV, float length)
+	public FabrikBone2D(Vector2 startLocation, Vector2 directionUV, float length)
 	{
 		// Sanity checking
 		Utils.validateDirectionUV(directionUV);
 
 		// Set the start and end locations
 		mStartLocation.set(startLocation);
-		mEndLocation.set( mStartLocation.plus( Vec2f.normalised(directionUV).times(length) ) );
+		mEndLocation.set(mStartLocation).mulAdd(directionUV.nor(), length);
 
 		// Set the bone length via the setLength method rather than directly on the mLength property so that validation is performed
 		setLength(length);
@@ -202,7 +202,7 @@ public class FabrikBone2D implements FabrikBone<Vec2f,FabrikJoint2D>
 	 *
 	 * @see FabrikChain2D.BaseboneConstraintType2D
 	 */
-	public FabrikBone2D(Vec2f startLocation, Vec2f directionUV, float length, float cwConstraintDegs, float acwConstraintDegs)
+	public FabrikBone2D(Vector2 startLocation, Vector2 directionUV, float length, float cwConstraintDegs, float acwConstraintDegs)
 	{
 		// Set up as per previous constructor - IllegalArgumentExceptions will be thrown for invalid directions or lengths
 		this(startLocation, directionUV, length);
@@ -238,7 +238,7 @@ public class FabrikBone2D implements FabrikBone<Vec2f,FabrikJoint2D>
 	 *
 	 * @see FabrikChain2D.BaseboneConstraintType2D
 	 */
-	public FabrikBone2D(Vec2f startLocation, Vec2f directionUV, float length, float cwConstraintDegs, float acwConstraintDegs, Colour4f colour)
+	public FabrikBone2D(Vector2 startLocation, Vector2 directionUV, float length, float cwConstraintDegs, float acwConstraintDegs, Colour4f colour)
 	{
 		this(startLocation, directionUV, length, cwConstraintDegs, acwConstraintDegs);
 		mColour.set(colour);
@@ -303,7 +303,7 @@ public class FabrikBone2D implements FabrikBone<Vec2f,FabrikJoint2D>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Vec2f getStartLocation() { return mStartLocation; }
+	public Vector2 getStartLocation() { return mStartLocation; }
 
 	/**
 	 * Get the start location of this bone in world-space as an array of two floats.
@@ -316,7 +316,7 @@ public class FabrikBone2D implements FabrikBone<Vec2f,FabrikJoint2D>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Vec2f getEndLocation() { return mEndLocation; }
+	public Vector2 getEndLocation() { return mEndLocation; }
 
 	/** Get the end location of the bone in world-space as an array of two floats.
 	 *
@@ -377,16 +377,18 @@ public class FabrikBone2D implements FabrikBone<Vec2f,FabrikJoint2D>
 	 * If the opposite (i.e. end to start) location is required then you can simply negate the provided direction.
 	 *
 	 * @return  The direction unit vector of this bone.
-	 * @see		Vec2f#negated()
 	 */
-	public Vec2f getDirectionUV() {	return Vec2f.getDirectionUV(mStartLocation, mEndLocation); }
+	public Vector2 getDirectionUV()
+	{
+		return mEndLocation.cpy().sub(mStartLocation).nor();
+	}
 
 	/**
 	 * Get the world-space constraint unit-vector of this bone.
 	 *
 	 * @return  The world-space constraint unit-vector of this bone.
 	 */
-	public Vec2f getGlobalConstraintUV()
+	public Vector2 getGlobalConstraintUV()
 	{
 		return mGlobalConstraintUV;
 	}
@@ -396,7 +398,7 @@ public class FabrikBone2D implements FabrikBone<Vec2f,FabrikJoint2D>
 	 *
 	 * @param	v	The world-space constraint unit vector.
 	 */
-	public void setGlobalConstraintUV(Vec2f v)
+	public void setGlobalConstraintUV(Vector2 v)
 	{
 		this.mGlobalConstraintUV = v;
 	}
@@ -467,7 +469,7 @@ public class FabrikBone2D implements FabrikBone<Vec2f,FabrikJoint2D>
 
 		sb.append("Start joint location : " + mStartLocation                                     + Utils.NEW_LINE);
 		sb.append("End   joint location : " + mEndLocation                                       + Utils.NEW_LINE);
-		sb.append("Bone direction       : " + Vec2f.getDirectionUV(mStartLocation, mEndLocation) + Utils.NEW_LINE);
+		sb.append("Bone direction       : " + mEndLocation.cpy().sub(mStartLocation).nor()       + Utils.NEW_LINE);
 		sb.append("Bone length          : " + mLength                                            + Utils.NEW_LINE);
 		sb.append( mJoint.toString() );
 
@@ -478,13 +480,13 @@ public class FabrikBone2D implements FabrikBone<Vec2f,FabrikJoint2D>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setStartLocation(Vec2f location) { mStartLocation.set(location); }
+	public void setStartLocation(Vector2 location) { mStartLocation.set(location); }
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setEndLocation(Vec2f location) { mEndLocation.set(location); }
+	public void setEndLocation(Vector2 location) { mEndLocation.set(location); }
 
 	/**
 	 * Set the length of the bone.

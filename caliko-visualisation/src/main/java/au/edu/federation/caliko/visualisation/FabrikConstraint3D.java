@@ -7,7 +7,6 @@ import au.edu.federation.utils.Colour4f;
 import au.edu.federation.utils.Mat3f;
 import au.edu.federation.utils.Mat4f;
 import au.edu.federation.utils.Utils;
-import au.edu.federation.utils.Vec3f;
 
 /**
  * A class to draw various constraints for ball and hinge joints on FabrikBone3D objects.

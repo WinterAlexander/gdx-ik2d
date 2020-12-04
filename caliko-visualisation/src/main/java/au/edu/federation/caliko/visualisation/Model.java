@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import au.edu.federation.utils.Vec3f;
 import au.edu.federation.utils.Vec3i;
 
 //TODO: This is pretty ineficient - change all the for..each loops to be normals loops to stop Java allocating memory.

@@ -3,7 +3,7 @@ package au.edu.federation.caliko;
 import java.io.Serializable;
 
 import au.edu.federation.utils.Utils;
-import au.edu.federation.utils.Vec3f;
+import com.badlogic.gdx.math.Vector3;
 
 /** 
  * A joint used to constrain the relative angle between FabrikBone3D objects in an IK chain.
@@ -125,10 +125,10 @@ public class FabrikJoint3D implements FabrikJoint<FabrikJoint3D>, Serializable
 	private float mHingeAnticlockwiseConstraintDegs = MAX_CONSTRAINT_ANGLE_DEGS;
 	
 	/** The unit vector axis about which a hinged joint may rotate. */
-	private Vec3f mRotationAxisUV = new Vec3f();
+	private Vector3 mRotationAxisUV = new Vector3();
 	
 	/** For a hinged joint, this is the axis used as a point of reference for rotation (it is NOT the axis about which the hinge rotates). */
-	private Vec3f mReferenceAxisUV = new Vec3f();
+	private Vector3 mReferenceAxisUV = new Vector3();
 	
 	/**
 	 * The type of this joint.
@@ -146,8 +146,8 @@ public class FabrikJoint3D implements FabrikJoint<FabrikJoint3D>, Serializable
 	 * <p>
 	 * By default, a FabrikJoint3D cannot be used until the type of joint that it represents has
 	 * been specified. This may be done via the {@link #setAsBallJoint(float)}, 
-	 * {@link #setAsGlobalHinge(au.edu.federation.utils.Vec3f, float, float, Vec3f)} or
-	 * {@link #setAsLocalHinge(au.edu.federation.utils.Vec3f, float, float, Vec3f)} methods.
+	 * {@link #setAsGlobalHinge(Vector3, float, float, Vector3)} or
+	 * {@link #setAsLocalHinge(Vector3, float, float, Vector3)} methods.
 	 */
 	public FabrikJoint3D() { }
 	
@@ -215,12 +215,12 @@ public class FabrikJoint3D implements FabrikJoint<FabrikJoint3D>, Serializable
 	 * @param anticlockwiseConstraintDegs	The anticlockwise constraint angle about the reference axis.
 	 * @param referenceAxis					The reference axis itself, which must fall within the plane of the hinge rotation axis.
 	 */
-	public void setHinge(JointType jointType, Vec3f rotationAxis, float clockwiseConstraintDegs, float anticlockwiseConstraintDegs, Vec3f referenceAxis)
+	public void setHinge(JointType jointType, Vector3 rotationAxis, float clockwiseConstraintDegs, float anticlockwiseConstraintDegs, Vector3 referenceAxis)
 	{
 		// Ensure the reference axis falls within the plane of the rotation axis (i.e. they are perpendicular, so their dot product is zero)		
-		if ( !Utils.approximatelyEquals( Vec3f.dotProduct(rotationAxis, referenceAxis), 0.0f, 0.01f) )
+		if ( !Utils.approximatelyEquals(rotationAxis.dot(referenceAxis), 0.0f, 0.01f) )
 		{
-			float angleDegs = Vec3f.getAngleBetweenDegs(rotationAxis, referenceAxis);
+			float angleDegs = Vector3.getAngleBetweenDegs(rotationAxis, referenceAxis);
 			throw new IllegalArgumentException("The reference axis must be in the plane of the hinge rotation axis - angle between them is currently: " + angleDegs);
 		}
 		
@@ -234,8 +234,8 @@ public class FabrikJoint3D implements FabrikJoint<FabrikJoint3D>, Serializable
 		mHingeClockwiseConstraintDegs     = clockwiseConstraintDegs;
 		mHingeAnticlockwiseConstraintDegs = anticlockwiseConstraintDegs;
 		mJointType                        = jointType;
-		mRotationAxisUV.set(  rotationAxis.normalised()  );
-		mReferenceAxisUV.set( referenceAxis.normalised() );
+		mRotationAxisUV.set(rotationAxis).nor();
+		mReferenceAxisUV.set(referenceAxis).nor();
 	}
 	
 	/**
@@ -250,7 +250,7 @@ public class FabrikJoint3D implements FabrikJoint<FabrikJoint3D>, Serializable
 	 * @param acwConstraintDegs		The anti-clockwise constraint angle in degrees.
 	 * @param globalReferenceAxis	The initial axis around the globalHingeRotationAxis which we will enforce rotational constraints.
 	 */
-	public void setAsGlobalHinge(Vec3f globalRotationAxis, float cwConstraintDegs, float acwConstraintDegs, Vec3f globalReferenceAxis)
+	public void setAsGlobalHinge(Vector3 globalRotationAxis, float cwConstraintDegs, float acwConstraintDegs, Vector3 globalReferenceAxis)
 	{
 		setHinge(JointType.GLOBAL_HINGE, globalRotationAxis, cwConstraintDegs, acwConstraintDegs, globalReferenceAxis);
 	}
@@ -267,7 +267,7 @@ public class FabrikJoint3D implements FabrikJoint<FabrikJoint3D>, Serializable
 	 * @param acwConstraintDegs		The anti-clockwise constraint angle in degrees.
 	 * @param localReferenceAxis	The initial axis around the localRotationAxis which we will enforce rotational constraints.
 	 */
-	public void setAsLocalHinge(Vec3f localRotationAxis, float cwConstraintDegs, float acwConstraintDegs, Vec3f localReferenceAxis)
+	public void setAsLocalHinge(Vector3 localRotationAxis, float cwConstraintDegs, float acwConstraintDegs, Vector3 localReferenceAxis)
 	{
 		setHinge(JointType.LOCAL_HINGE, localRotationAxis, cwConstraintDegs, acwConstraintDegs, localReferenceAxis);
 	}
@@ -403,13 +403,13 @@ public class FabrikJoint3D implements FabrikJoint<FabrikJoint3D>, Serializable
 	 * 
 	 * @param axis	The axis which the hinge rotates about.
 	 */
-	public void setHingeRotationAxis(Vec3f axis)
+	public void setHingeRotationAxis(Vector3 axis)
 	{
 		FabrikJoint3D.validateAxis(axis);
 		
 		if ( mJointType != JointType.BALL )
 		{
-			mRotationAxisUV.set( axis.normalised() );
+			mRotationAxisUV.set(axis).nor();
 		}
 		else
 		{
@@ -424,7 +424,7 @@ public class FabrikJoint3D implements FabrikJoint<FabrikJoint3D>, Serializable
 	 * 
 	 * @return	The hinge reference axis vector.
 	 */
-	public Vec3f getHingeReferenceAxis()
+	public Vector3 getHingeReferenceAxis()
 	{	
 		if ( mJointType != JointType.BALL )
 		{
@@ -444,13 +444,13 @@ public class FabrikJoint3D implements FabrikJoint<FabrikJoint3D>, Serializable
 	 * 
 	 * @param referenceAxis	The reference axis about which hinge rotation is measured.
 	 */
-	public void setHingeReferenceAxis(Vec3f referenceAxis)
+	public void setHingeReferenceAxis(Vector3 referenceAxis)
 	{
 		FabrikJoint3D.validateAxis(referenceAxis);
 		
 		if ( mJointType != JointType.BALL )
 		{
-			mReferenceAxisUV.set( referenceAxis.normalised() );
+			mReferenceAxisUV.set(referenceAxis).nor();
 		}
 		else
 		{
@@ -465,7 +465,7 @@ public class FabrikJoint3D implements FabrikJoint<FabrikJoint3D>, Serializable
 	 * 
 	 * @return	The hinge rotation axis vector.
 	 */
-	public Vec3f getHingeRotationAxis()
+	public Vector3 getHingeRotationAxis()
 	{	
 		if ( mJointType != JointType.BALL )
 		{
@@ -528,12 +528,10 @@ public class FabrikJoint3D implements FabrikJoint<FabrikJoint3D>, Serializable
 		}
 	}
 	
-	private static void validateAxis(Vec3f axis)
+	private static void validateAxis(Vector3 axis)
 	{
-		if ( axis.length() <= 0.0f )
-		{
+		if(axis.len2() <= 0.0f)
 			throw new IllegalArgumentException("Provided axis is illegal - it has a magnitude of zero.");
-		}
 	}
 
   @Override

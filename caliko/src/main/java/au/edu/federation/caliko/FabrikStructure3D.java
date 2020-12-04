@@ -8,7 +8,7 @@ import java.util.List;
 import au.edu.federation.caliko.FabrikChain3D.BaseboneConstraintType3D;
 import au.edu.federation.utils.Mat3f;
 import au.edu.federation.utils.Utils;
-import au.edu.federation.utils.Vec3f;
+import com.badlogic.gdx.math.Vector3;
 
 /** 
  * A FabrikStructure3D contains one or more FabrikChain3D objects, which we can solve using the FABRIK (Forward And
@@ -26,7 +26,7 @@ import au.edu.federation.utils.Vec3f;
  * @version 0.5 - 19/06/2019
  **/
 
-public class FabrikStructure3D implements FabrikStructure<FabrikChain3D,Vec3f>, Serializable
+public class FabrikStructure3D implements FabrikStructure<FabrikChain3D, Vector3>, Serializable
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -73,7 +73,7 @@ public class FabrikStructure3D implements FabrikStructure<FabrikChain3D,Vec3f>, 
 	 * @param   newTargetLocation	The location of the target for which we will attempt to solve all chains attached to this structure.
 	 */
 	@Override
-	public void solveForTarget(Vec3f newTargetLocation)
+	public void solveForTarget(Vector3 newTargetLocation)
 	{
 		int numChains = mChains.size();
 		int connectedChainNumber;

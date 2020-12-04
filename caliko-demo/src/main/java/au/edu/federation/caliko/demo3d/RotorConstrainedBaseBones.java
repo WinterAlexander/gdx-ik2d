@@ -7,7 +7,6 @@ import au.edu.federation.caliko.FabrikChain3D.BaseboneConstraintType3D;
 import au.edu.federation.utils.Colour4f;
 import au.edu.federation.utils.Mat4f;
 import au.edu.federation.utils.Utils;
-import au.edu.federation.utils.Vec3f;
 
 /**
  * @author jsalvo

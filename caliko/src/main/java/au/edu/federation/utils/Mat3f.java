@@ -1,5 +1,7 @@
 package au.edu.federation.utils;
 
+import com.badlogic.gdx.math.Vector3;
+
 import java.text.DecimalFormat;
 
 /** 
@@ -81,7 +83,7 @@ public class Mat3f
 	 * @param yAxis	The positive Y-axis to set.
 	 * @param zAxis	The positive Z-axis to set.
 	 */
-	public Mat3f(Vec3f xAxis, Vec3f yAxis, Vec3f zAxis)
+	public Mat3f(Vector3 xAxis, Vector3 yAxis, Vector3 zAxis)
 	{
 		m00 = xAxis.x;
 		m01 = xAxis.y; 
@@ -146,9 +148,9 @@ public class Mat3f
 	 * @param	referenceDirection	The vector to use as the Z-Axis
 	 * @return	The created rotation matrix.
 	 *
-	 * @see Vec3f#genPerpendicularVectorQuick(Vec3f) 
+	 * @see Vec3f#genPerpendicularVectorQuick(Vector3)
 	 */
-	public static Mat3f createRotationMatrix(Vec3f referenceDirection)
+	public static Mat3f createRotationMatrix(Vector3 referenceDirection)
 	{	
 		/*** You may want to try this - but the generated rotation matrix will be a little different (see below):
 		     Note: There is no difference in solve distance between these, performance varies slightly - see test details on build (i.e. "mvn package")
@@ -231,14 +233,14 @@ public class Mat3f
 		if (Math.abs(referenceDirection.y) > 0.9999f)
 		{
 			rotMat.setZBasis(referenceDirection);
-			rotMat.setXBasis( new Vec3f(1.0f, 0.0f, 0.0f));
-			rotMat.setYBasis( Vec3f.crossProduct( rotMat.getXBasis(), rotMat.getZBasis()).normalised());
+			rotMat.setXBasis( new Vector3(1.0f, 0.0f, 0.0f));
+			rotMat.setYBasis( new Vector3(rotMat.getXBasis()).crs(rotMat.getZBasis()).nor());
 		}
 		else
 		{
 			rotMat.setZBasis( referenceDirection );		
-			rotMat.setXBasis( Vec3f.crossProduct( referenceDirection, new Vec3f(0.0f, 1.0f, 0.0f) ).normalised() );
-			rotMat.setYBasis( Vec3f.crossProduct( rotMat.getXBasis(), rotMat.getZBasis() ).normalised() );
+			rotMat.setXBasis(new Vector3(referenceDirection).crs(0f, 1f, 0f).nor());
+			rotMat.setYBasis(new Vector3(rotMat.getXBasis()).crs(rotMat.getZBasis()).nor());
 		}
 
 		return rotMat;
@@ -252,9 +254,9 @@ public class Mat3f
 	 */
 	public boolean isOrthogonal()
 	{
-		float xCrossYDot = Vec3f.dotProduct(this.getXBasis(), this.getYBasis());
-		float xCrossZDot = Vec3f.dotProduct(this.getXBasis(), this.getZBasis());
-		float yCrossZDot = Vec3f.dotProduct(this.getYBasis(), this.getZBasis());
+		float xCrossYDot = this.getXBasis().dot(this.getYBasis());
+		float xCrossZDot = this.getXBasis().dot(this.getZBasis());
+		float yCrossZDot = this.getYBasis().dot(this.getZBasis());
 		
 		if ( Utils.approximatelyEquals(xCrossYDot, 0.0f,  0.01f) &&
 		     Utils.approximatelyEquals(xCrossZDot, 0.0f,  0.01f) &&
@@ -304,9 +306,9 @@ public class Mat3f
 	 * @param	source	The source vector to transform.
 	 * @return		The provided source vector transformed by this matrix. 
 	 */
-	public Vec3f times(Vec3f source)
+	public Vector3 times(Vector3 source)
 	{
-		return new Vec3f(this.m00 * source.x + this.m10 * source.y + this.m20 * source.z,
+		return new Vector3(this.m00 * source.x + this.m10 * source.y + this.m20 * source.z,
 				 this.m01 * source.x + this.m11 * source.y + this.m21 * source.z,
 				 this.m02 * source.x + this.m12 * source.y + this.m22 * source.z);
 	}
@@ -350,7 +352,7 @@ public class Mat3f
 	 *  @param	rotationAxis	The axis to rotate this matrix about, relative to the current configuration of this matrix.
 	 *  @return					The rotated version of this matrix.
 	 */ 
-	public Mat3f rotateRads(Vec3f rotationAxis, float angleRads)
+	public Mat3f rotateRads(Vector3 rotationAxis, float angleRads)
 	{
 		// Note: we need this temporary matrix because we cannot perform this operation 'in-place'.
 		Mat3f dest = new Mat3f();
@@ -409,49 +411,49 @@ public class Mat3f
 	 *  @param	localAxis	The axis to rotate this matrix about, relative to the current configuration of this matrix.
 	 *  @return			The rotated version of this matrix.
 	 *  */ 
-	public Mat3f rotateDegs(float angleDegs, Vec3f localAxis) { return this.rotateRads(localAxis, angleDegs * DEGS_TO_RADS); }
+	public Mat3f rotateDegs(float angleDegs, Vector3 localAxis) { return this.rotateRads(localAxis, angleDegs * DEGS_TO_RADS); }
 
 	/**
 	 * Set the X basis of this matrix.
 	 *
 	 * @param	v	The vector to use as the X-basis of this matrix.
 	 */
-	public void setXBasis(Vec3f v) { m00 = v.x; m01 = v.y; m02 = v.z; }
+	public void setXBasis(Vector3 v) { m00 = v.x; m01 = v.y; m02 = v.z; }
 	
 	/**
 	 * Get the X basis of this matrix.
 	 * 
 	 * @return The X basis of this matrix as a Vec3f
 	 **/
-	public Vec3f getXBasis() { return new Vec3f(m00, m01, m02); }
+	public Vector3 getXBasis() { return new Vector3(m00, m01, m02); }
 
 	/**
 	 * Set the Y basis of this matrix.
 	 *
 	 * @param	v	The vector to use as the Y-basis of this matrix.
 	 */
-	public void setYBasis(Vec3f v) { m10 = v.x; m11 = v.y; m12 = v.z; }
+	public void setYBasis(Vector3 v) { m10 = v.x; m11 = v.y; m12 = v.z; }
 	
 	/**
 	 * Get the Y basis of this matrix.
 	 * 
 	 * @return The Y basis of this matrix as a Vec3f
 	 **/
-	public Vec3f getYBasis() { return new Vec3f(m10, m11, m12); }
+	public Vector3 getYBasis() { return new Vector3(m10, m11, m12); }
 
 	/**
 	 * Set the Z basis of this matrix.
 	 *
 	 * @param	v	The vector to use as the Z-basis of this matrix.
 	 */
-	public void setZBasis(Vec3f v) { m20 = v.x; m21 = v.y; m22 = v.z; }
+	public void setZBasis(Vector3 v) { m20 = v.x; m21 = v.y; m22 = v.z; }
 
 	/**
 	 * Get the Z basis of this matrix.
 	 * 
 	 * @return The Z basis of this matrix as a Vec3f
 	 **/
-	public Vec3f getZBasis() { return new Vec3f(m20, m21, m22); }
+	public Vector3 getZBasis() { return new Vector3(m20, m21, m22); }
 
 	/**
 	 * Return this Mat3f as an array of 9 floats.

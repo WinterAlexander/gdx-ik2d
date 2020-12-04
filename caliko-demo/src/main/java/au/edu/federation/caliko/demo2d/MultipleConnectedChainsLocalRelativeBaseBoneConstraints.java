@@ -7,7 +7,6 @@ import au.edu.federation.caliko.FabrikChain2D.BaseboneConstraintType2D;
 import au.edu.federation.caliko.FabrikStructure2D;
 import au.edu.federation.utils.Mat4f;
 import au.edu.federation.utils.Utils;
-import au.edu.federation.utils.Vec2f;
 
 /**
  * @author jsalvo
@@ -23,7 +22,7 @@ public class MultipleConnectedChainsLocalRelativeBaseBoneConstraints extends Cal
 		float boneLength = 50.0f;
 		FabrikChain2D verticalChain = new FabrikChain2D();
 		
-		FabrikBone2D basebone = new FabrikBone2D( new Vec2f(0.0f, -100.0f), UP, boneLength);
+		FabrikBone2D basebone = new FabrikBone2D( new Vector2(0.0f, -100.0f), UP, boneLength);
 		basebone.setClockwiseConstraintDegs(15.0f);
 		basebone.setAnticlockwiseConstraintDegs(15.0f);
 		
@@ -40,7 +39,7 @@ public class MultipleConnectedChainsLocalRelativeBaseBoneConstraints extends Cal
 		boneLength = 30.0f;
 		
 		// Create the base bone
-		basebone = new FabrikBone2D( new Vec2f(), new Vec2f(-boneLength, 0.0f) );
+		basebone = new FabrikBone2D( new Vector2(), new Vector2(-boneLength, 0.0f) );
 		basebone.setClockwiseConstraintDegs(60.0f);
 		basebone.setAnticlockwiseConstraintDegs(60.0f);
 		basebone.setColour(Utils.MID_GREEN);
@@ -61,7 +60,7 @@ public class MultipleConnectedChainsLocalRelativeBaseBoneConstraints extends Cal
 		
 		// ----- Right branch chain -----				
 		// Create the base bone
-		basebone = new FabrikBone2D( new Vec2f(), new Vec2f(boneLength, 0.0f) );
+		basebone = new FabrikBone2D( new Vector2(), new Vector2(boneLength, 0.0f) );
 		basebone.setClockwiseConstraintDegs(30.0f);
 		basebone.setAnticlockwiseConstraintDegs(30.0f);
 		basebone.setColour(Utils.GREY);

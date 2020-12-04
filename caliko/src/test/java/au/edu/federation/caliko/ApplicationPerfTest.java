@@ -4,7 +4,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.File;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -13,7 +12,6 @@ import org.junit.rules.TemporaryFolder;
 
 import au.edu.federation.utils.SerializationUtil;
 import au.edu.federation.utils.Utils;
-import au.edu.federation.utils.Vec3f;
 import au.edu.federation.utils.Mat3f;
 
 public class ApplicationPerfTest

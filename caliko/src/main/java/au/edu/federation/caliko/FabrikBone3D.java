@@ -4,9 +4,8 @@ import java.io.Serializable;
 
 import au.edu.federation.caliko.FabrikJoint3D.JointType;
 import au.edu.federation.utils.Colour4f;
-import au.edu.federation.utils.Mat4f;
 import au.edu.federation.utils.Utils;
-import au.edu.federation.utils.Vec3f;
+import com.badlogic.gdx.math.Vector3;
 
 /**
  * A class to represent a FabrikBone3D object.
@@ -19,7 +18,7 @@ import au.edu.federation.utils.Vec3f;
  * @see FabrikJoint3D
  */
 
-public class FabrikBone3D implements FabrikBone<Vec3f,FabrikJoint3D>, Serializable
+public class FabrikBone3D implements FabrikBone<Vector3, FabrikJoint3D>, Serializable
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -80,7 +79,7 @@ public class FabrikBone3D implements FabrikBone<Vec3f,FabrikJoint3D>, Serializab
 	 * The start location of a bone may only be set through a constructor or via an 'addBone'
 	 * method provided by the {@link FabrikChain3D} class.
 	 */
-	private Vec3f mStartLocation = new Vec3f();
+	private Vector3 mStartLocation = new Vector3();
 	
 	/**
 	 * mEndLocation	The end location of this FabrikBone3D object.
@@ -88,7 +87,7 @@ public class FabrikBone3D implements FabrikBone<Vec3f,FabrikJoint3D>, Serializab
 	 * The end location of a bone may only be set through a constructor or indirectly via an
 	 * 'addBone' method provided by the {@link FabrikChain3D} class.
 	 */
-	private Vec3f mEndLocation = new Vec3f();
+	private Vector3 mEndLocation = new Vector3();
 
 	/**
 	 * mName	The name of this FabrikBone3D object.
@@ -100,8 +99,8 @@ public class FabrikBone3D implements FabrikBone<Vec3f,FabrikJoint3D>, Serializab
 	 * will be truncated.
 	 * 
 	 * @see #setName(String)
-	 * @see #FabrikBone3D(Vec3f, Vec3f, String)
-	 * @see #FabrikBone3D(Vec3f, Vec3f, float, String)
+	 * @see #FabrikBone3D(Vector3, Vector3, String)
+	 * @see #FabrikBone3D(Vector3, Vector3, float, String)
 	 */
 	private String mName;
 	
@@ -151,26 +150,26 @@ public class FabrikBone3D implements FabrikBone<Vec3f,FabrikJoint3D>, Serializab
 	 * @param	startLocation	The start location of this bone.
 	 * @param	endLocation		The end location of this bone.
 	 */
-	public FabrikBone3D(Vec3f startLocation, Vec3f endLocation)
+	public FabrikBone3D(Vector3 startLocation, Vector3 endLocation)
 	{
 		mStartLocation.set(startLocation);
 		mEndLocation.set(endLocation);
 		
 		// Set the length of the bone - if the length is not a positive value then an InvalidArgumentException is thrown
-		setLength( Vec3f.distanceBetween(startLocation, endLocation) );
+		setLength(startLocation.dst(endLocation));
 	}
 	
 	/**
 	 * Create a new FabrikBone3D from a start and end location and a String.
 	 * <p>
 	 * This constructor is merely for convenience if you intend on working with named bones, and internally
-	 * calls the {@link #FabrikBone3D(Vec3f, Vec3f)} constructor.
+	 * calls the {@link #FabrikBone3D(Vector3, Vector3)} constructor.
 	 * 
 	 * @param	startLocation	The start location of this bone.
 	 * @param	endLocation		The end location of this bone.
 	 * @param	name			The name of this bone.
 	 */
-	public FabrikBone3D(Vec3f startLocation, Vec3f endLocation, String name)
+	public FabrikBone3D(Vector3 startLocation, Vector3 endLocation, String name)
 	{
 		// Call the start/end location constructor - which also sets the length of the bone
 		this(startLocation, endLocation);
@@ -191,25 +190,24 @@ public class FabrikBone3D implements FabrikBone<Vec3f,FabrikJoint3D>, Serializab
 	 * @param	directionUV		The direction unit vector of this bone.
 	 * @param	length			The length of this bone.
 	 */
-	public FabrikBone3D(Vec3f startLocation, Vec3f directionUV, float length)
+	public FabrikBone3D(Vector3 startLocation, Vector3 directionUV, float length)
 	{
 		// Sanity checking
 		setLength(length); // Throws IAE if < zero
-		if ( directionUV.length() <= 0.0f ) { 
-		  throw new IllegalArgumentException("Direction cannot be a zero vector"); 
-		}
+		if(directionUV.len2() <= 0.0f)
+		  throw new IllegalArgumentException("Direction cannot be a zero vector");
 		
 		// Set the length, start and end locations
 		setLength(length);
 		mStartLocation.set(startLocation);
-		mEndLocation.set( mStartLocation.plus( directionUV.normalised().times(length) ) );
+		mEndLocation.set(mStartLocation).mulAdd(directionUV.nor(), length);
 	}
 	
 	/**
 	 * Create a named FabrikBone3D from a start location, a direction unit vector, a bone length and a name.
 	 * <p>
 	 * This constructor is merely for convenience if you intend on working with named bones, and internally
-	 * calls the {@link #FabrikBone3D(Vec3f, Vec3f, float)} constructor.
+	 * calls the {@link #FabrikBone3D(Vector3, Vector3, float)} constructor.
 	 * <p>
 	 * If the provided length argument is zero or if the direction is a zero vector then an IllegalArgumentException is thrown.
 	 * 
@@ -218,7 +216,7 @@ public class FabrikBone3D implements FabrikBone<Vec3f,FabrikJoint3D>, Serializab
 	 * @param	length			The length of this bone.
 	 * @param	name			The name of this bone.
 	 */
-	public FabrikBone3D(Vec3f startLocation, Vec3f directionUV, float length, String name)
+	public FabrikBone3D(Vector3 startLocation, Vector3 directionUV, float length, String name)
 	{
 		this(startLocation, directionUV, length);
 		setName(name);
@@ -228,14 +226,14 @@ public class FabrikBone3D implements FabrikBone<Vec3f,FabrikJoint3D>, Serializab
 	 * Create a new FabrikBone3D from a start location, a direction unit vector, a bone length and a colour.
 	 * <p>
 	 * This constructor is merely for convenience if you intend on working with named bones, and internally
-	 * calls the {@link #FabrikBone3D(Vec3f, Vec3f, float)} constructor.
+	 * calls the {@link #FabrikBone3D(Vector3, Vector3, float)} constructor.
 	 * 
 	 * @param	startLocation	The start location of this bone.
 	 * @param	directionUV		The direction unit vector of this bone.
 	 * @param	length			The length of this bone.
 	 * @param	colour			The colour to draw this bone.
 	 */
-	public FabrikBone3D(Vec3f startLocation, Vec3f directionUV, float length, Colour4f colour)
+	public FabrikBone3D(Vector3 startLocation, Vector3 directionUV, float length, Colour4f colour)
 	{
 		this(startLocation, directionUV, length);
 		setColour(colour);
@@ -278,7 +276,7 @@ public class FabrikBone3D implements FabrikBone<Vec3f,FabrikJoint3D>, Serializab
 	 *
 	 * @return	The 'live' calculated distance between the start and end locations of this bone.
 	 */
-	public float liveLength() { return Vec3f.distanceBetween(mStartLocation, mEndLocation);	}
+	public float liveLength() { return mStartLocation.dst(mEndLocation);	}
 	
 	/**
 	 * Specify the bone connection point of this bone.
@@ -328,7 +326,7 @@ public class FabrikBone3D implements FabrikBone<Vec3f,FabrikJoint3D>, Serializab
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Vec3f getStartLocation() { return mStartLocation; }
+	public Vector3 getStartLocation() { return mStartLocation; }
 	
 	/**
 	 * Return the start location of this bone as an array of three floats.
@@ -341,7 +339,7 @@ public class FabrikBone3D implements FabrikBone<Vec3f,FabrikJoint3D>, Serializab
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Vec3f getEndLocation() { return mEndLocation; }
+	public Vector3 getEndLocation() { return mEndLocation; }
 	
 	/**
 	 * Return the end location of this bone as an array of three floats.
@@ -435,12 +433,10 @@ public class FabrikBone3D implements FabrikBone<Vec3f,FabrikJoint3D>, Serializab
 	 * If the opposite (i.e. end to start) location is required then you can simply negate the provided direction.
 	 * 
 	 * @return  The direction unit vector of this bone.
-	 * @see		Vec3f#negate()
-	 * @see		Vec3f#negated()
 	 */
-	public Vec3f getDirectionUV()
+	public Vector3 getDirectionUV()
 	{
-		return Vec3f.getDirectionUV(mStartLocation, mEndLocation);
+		return mEndLocation.cpy().sub(mStartLocation).nor();
 	}
 
 
