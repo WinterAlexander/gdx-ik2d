@@ -8,9 +8,9 @@
   <name>caliko</name>
   <url>https://github.com/FedUni/caliko</url>
   <parent>
-    <groupId>au.edu.federation.caliko</groupId>
+    <groupId>me.winter.caliko</groupId>
     <artifactId>caliko-aggregate</artifactId>
-    <version>WINTER-1.0</version>
+    <version>1.0</version>
   </parent>  
 
   <licenses>

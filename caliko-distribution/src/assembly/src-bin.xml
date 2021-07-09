@@ -14,9 +14,9 @@
       <useAllReactorProjects>true</useAllReactorProjects>
 	  
       <includes>
-        <include>au.edu.federation.caliko:caliko</include>
-        <include>au.edu.federation.caliko.visualisation:caliko-visualisation</include>
-        <include>au.edu.federation.caliko.demo:caliko-demo</include>
+        <include>me.winter.caliko:caliko</include>
+        <include>me.winter.caliko.visualisation:caliko-visualisation</include>
+        <include>me.winter.caliko.demo:caliko-demo</include>
       </includes>
 	  
       <sources>
