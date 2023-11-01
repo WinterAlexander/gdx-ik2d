@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>au.edu.federation.caliko</groupId>
+    <groupId>me.winter.caliko</groupId>
     <artifactId>caliko-aggregate</artifactId>
-    <version>WINTER-1.0</version>
+    <version>1.0</version>
   </parent>
 
   <artifactId>caliko-distribution</artifactId>
@@ -20,17 +20,17 @@
          Therefore, I have listed all the modules that we want to generate aggregated Javadocs for. -->
 		 
     <dependency>
-      <groupId>au.edu.federation.caliko.visualisation</groupId>
+      <groupId>me.winter.caliko.visualisation</groupId>
       <artifactId>caliko-visualisation</artifactId>
     </dependency>
 	
     <dependency>
-      <groupId>au.edu.federation.caliko</groupId>
+      <groupId>me.winter.caliko</groupId>
       <artifactId>caliko</artifactId>
     </dependency>
 	
     <dependency>
-      <groupId>au.edu.federation.caliko.demo</groupId>
+      <groupId>me.winter.caliko.demo</groupId>
       <artifactId>caliko-demo</artifactId>
     </dependency>
 	
@@ -47,9 +47,9 @@
 		  <configuration>
 	        <includeDependencySources>true</includeDependencySources>
 	        <dependencySourceIncludes>
-	          <dependencySourceInclude>au.edu.federation.caliko:*</dependencySourceInclude>
-	          <dependencySourceInclude>au.edu.federation.caliko.visualisation:*</dependencySourceInclude>
-	          <dependencySourceInclude>au.edu.federation.caliko.demo:*</dependencySourceInclude>
+	          <dependencySourceInclude>me.winter.caliko:*</dependencySourceInclude>
+	          <dependencySourceInclude>me.winter.caliko.visualisation:*</dependencySourceInclude>
+	          <dependencySourceInclude>me.winter.caliko.demo:*</dependencySourceInclude>
 	        </dependencySourceIncludes>
 	        <reportOutputDirectory>${project.build.directory}</reportOutputDirectory>          
 	      </configuration>     

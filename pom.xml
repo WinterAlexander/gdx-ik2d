@@ -2,16 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>au.edu.federation.caliko</groupId>
+  <groupId>me.winter.caliko</groupId>
   
   <!-- This POM (e.g. this file) is the parent of all the other POMs (which are defined as modules below!) -->
   <artifactId>caliko-aggregate</artifactId>
   
   <packaging>pom</packaging>
-  <version>WINTER-1.0</version>
+  <version>1.0</version>
   <name>Caliko library Aggregate POM</name>
   <description>POM to build the Caliko library including the visualisation component, demo application, source and documentation archives.</description>
-  <url>https://github.com/FedUni/caliko</url>
+  <url>https://github.com/WinterAlexander/caliko</url>
   
   <!-- Version numbers we can grab to keep them consistent throughout our maven build files -->
   <properties> 
@@ -43,19 +43,19 @@
     <dependencies>
 	
       <dependency>
-        <groupId>au.edu.federation.caliko</groupId>
+        <groupId>me.winter.caliko</groupId>
         <artifactId>caliko</artifactId>
         <version>${project.version}</version>
       </dependency>
 	  
       <dependency>
-        <groupId>au.edu.federation.caliko.visualisation</groupId>
+        <groupId>me.winter.caliko.visualisation</groupId>
         <artifactId>caliko-visualisation</artifactId>
         <version>${project.version}</version>
       </dependency>
 	  
       <dependency>
-        <groupId>au.edu.federation.caliko.demo</groupId>
+        <groupId>me.winter.caliko.demo</groupId>
         <artifactId>caliko-demo</artifactId>
         <version>${project.version}</version>
       </dependency>
