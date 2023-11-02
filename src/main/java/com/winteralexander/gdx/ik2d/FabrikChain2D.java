@@ -357,7 +357,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 			Vector2 prevBoneEnd = mChain.get(this.mChain.size() - 1).getEndLocation();
 
 			// Add a bone to the end of this IK chain
-			addBone(new FabrikBone2D(prevBoneEnd, directionUV.nor(), length, clockwiseDegs, anticlockwiseDegs));
+			addBone(new FabrikBone2D(prevBoneEnd, directionUV.cpy().nor(), length, clockwiseDegs, anticlockwiseDegs));
 		} else {
 			// Attempting to add a relative bone when there is no base bone for it to be relative to?
 			throw new RuntimeException("You cannot add the base bone to a chain using this method as it does not provide a start location.");
@@ -422,8 +422,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 
 			// Add a bone to the end of this IK chain
 			addBone(bone);
-		} else // Attempting to add a relative bone when there is no base bone for it to be relative to?
-		{
+		} else {// Attempting to add a relative bone when there is no base bone for it to be relative to?
 			throw new RuntimeException("You cannot add the base bone to a chain using this method as it does not provide a start location.");
 		}
 	}
@@ -434,7 +433,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * @return The basebone constraint type of this chain.
 	 */
 	@Override
-	public BaseboneConstraintType2D getBaseboneConstraintType() {return mBaseboneConstraintType;}
+	public BaseboneConstraintType2D getBaseboneConstraintType() { return mBaseboneConstraintType; }
 
 	/**
 	 * Return the basebone constraint unit vector.
@@ -482,7 +481,9 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 *
 	 * @return The bone connection point of this chain.
 	 */
-	public BoneConnectionPoint getBoneConnectionPoint() {return mBoneConnectionPoint;}
+	public BoneConnectionPoint getBoneConnectionPoint() {
+		return mBoneConnectionPoint;
+	}
 
 	/**
 	 * Return the actual IK chain of this FabrikChain2D object,
@@ -490,7 +491,9 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * @return The IK chain of this FabrikChain2D as a List of FabrikBone2D objects.
 	 */
 	@Override
-	public List<FabrikBone2D> getChain() {return mChain;}
+	public List<FabrikBone2D> getChain() {
+		return mChain;
+	}
 
 	/**
 	 * Return the current length of this IK chain.
@@ -501,7 +504,9 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * @return The length of this IK chain as stored in the mChainLength property.
 	 */
 	@Override
-	public float getChainLength() {return mChainLength;}
+	public float getChainLength() {
+		return mChainLength;
+	}
 
 	/**
 	 * Return the number of the bone in another chain that this FabrikChain2D is connected to.
@@ -509,7 +514,9 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * @return The connected bone number as stored in the mConnectedBoneNumber property.
 	 */
 	@Override
-	public int getConnectedBoneNumber() {return mConnectedBoneNumber;}
+	public int getConnectedBoneNumber() {
+		return mConnectedBoneNumber;
+	}
 
 	/**
 	 * Return the number of the chain in the structure containing this FabrikChain2D that this chain is connected to.
@@ -517,7 +524,9 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * @return The connected chain number as stored in the mConnectedChainNumber property.
 	 */
 	@Override
-	public int getConnectedChainNumber() {return mConnectedChainNumber;}
+	public int getConnectedChainNumber() {
+		return mConnectedChainNumber;
+	}
 
 	/**
 	 * Return the location of the end effector in the IK chain.
@@ -546,7 +555,9 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * @return whether or not this chain uses an embedded target.
 	 */
 	@Override
-	public boolean getEmbeddedTargetMode() {return mUseEmbeddedTarget;}
+	public boolean getEmbeddedTargetMode() {
+		return mUseEmbeddedTarget;
+	}
 
 	/**
 	 * Return the embedded target location.
@@ -554,7 +565,9 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * @return the embedded target location.
 	 */
 	@Override
-	public Vector2 getEmbeddedTarget() {return mEmbeddedTarget;}
+	public Vector2 getEmbeddedTarget() {
+		return mEmbeddedTarget;
+	}
 
 	/**
 	 * Return the last target location for which we  attempted to solve this IK chain.
@@ -564,7 +577,9 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * @return The last target location that we attempted to solve this chain for.
 	 */
 	@Override
-	public Vector2 getLastTargetLocation() {return mLastTargetLocation;}
+	public Vector2 getLastTargetLocation() {
+		return mLastTargetLocation;
+	}
 
 	/**
 	 * Return the name of this FabrikChain2D.
@@ -574,7 +589,9 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * @see #getName()
 	 */
 	@Override
-	public String getName() {return mName;}
+	public String getName() {
+		return mName;
+	}
 
 	/**
 	 * Return the number of bones in the IK chain.
@@ -584,7 +601,9 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * @return The number of bones in the FabrikChain2D.
 	 */
 	@Override
-	public int getNumBones() {return this.mChain.size();}
+	public int getNumBones() {
+		return this.mChain.size();
+	}
 
 	/**
 	 * Remove a bone from this IK chain.
@@ -603,7 +622,6 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	public void removeBone(int boneNumber) {
 		// If the bone number is a bone which exists...
 		if(boneNumber < this.mChain.size()) {
-
 			// ...then remove the bone, decrease the bone count and update the chain length.
 			mChain.remove(boneNumber);
 			updateChainLength();
@@ -639,7 +657,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 		}
 
 		// All good? Then normalise the constraint direction and set it
-		mBaseboneConstraintUV.set(constraintUV.nor());
+		mBaseboneConstraintUV.set(constraintUV.cpy().nor());
 	}
 
 	/**
@@ -648,7 +666,9 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * @param baseLocation The location to set the mBaseLocation property.
 	 * @see #mBaseLocation
 	 */
-	public void setBaseLocation(Vector2 baseLocation) {mBaseLocation.set(baseLocation);}
+	public void setBaseLocation(Vector2 baseLocation) {
+		mBaseLocation.set(baseLocation);
+	}
 
 	/**
 	 * Set the bone connection point of this chain.
@@ -678,14 +698,18 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 *
 	 * @param boneNumber The number of the bone this chain is connected to.
 	 */
-	void setConnectedBoneNumber(int boneNumber) {mConnectedBoneNumber = boneNumber;}
+	void setConnectedBoneNumber(int boneNumber) {
+		mConnectedBoneNumber = boneNumber;
+	}
 
 	/**
 	 * Set which number chain this chain is connected to in a FabrikStructure2D object.
 	 *
 	 * @param chainNumber The number of the chain that this chain is connected to.
 	 */
-	void setConnectedChainNumber(int chainNumber) {mConnectedChainNumber = chainNumber;}
+	void setConnectedChainNumber(int chainNumber) {
+		mConnectedChainNumber = chainNumber;
+	}
 
 	/**
 	 * Set the fixed base bone mode for this chain.
@@ -818,10 +842,10 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 				FabrikBone2D outerBone = mChain.get(loop + 1);
 
 				// Get the outer-to-inner unit vector of the bone further out
-				Vector2 outerBoneOuterToInnerUV = outerBone.getDirectionUV().cpy().scl(-1f, -1f);
+				Vector2 outerBoneOuterToInnerUV = outerBone.getDirectionUV().cpy().scl(-1f);
 
 				// Get the outer-to-inner unit vector of this bone
-				Vector2 thisBoneOuterToInnerUV = thisBone.getDirectionUV().cpy().scl(-1f, -1f);
+				Vector2 thisBoneOuterToInnerUV = thisBone.getDirectionUV().cpy().scl(-1f);
 
 				// Constrain the angle between the outer bone and this bone.
 				// Note: On the forward pass we constrain to the limits imposed by joint of the outer bone.
@@ -846,7 +870,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 				// At this stage we have a outer-to-inner unit vector for this bone which is within our constraints,
 				// so we can set the new inner joint location to be the end joint location of this bone plus the
 				// outer-to-inner direction unit vector multiplied by the length of the bone.
-				Vector2 newStartLocation = thisBone.getEndLocation().cpy().add(constrainedUV.cpy().scl(boneLength));
+				Vector2 newStartLocation = thisBone.getEndLocation().cpy().mulAdd(constrainedUV, boneLength);
 
 				// Set the new start joint location for this bone
 				thisBone.setStartLocation(newStartLocation);
@@ -908,7 +932,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 
 				// Calculate the new start joint location as the end joint location plus the outer-to-inner direction UV
 				// multiplied by the length of the bone.
-				Vector2 newStartLocation = thisBone.getEndLocation().cpy().add(constrainedUV.cpy().scl(boneLength));
+				Vector2 newStartLocation = thisBone.getEndLocation().cpy().mulAdd(constrainedUV, boneLength);
 
 				// Set the new start joint location for this bone to be new start location...
 				thisBone.setStartLocation(newStartLocation);
@@ -948,8 +972,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 							prevBoneInnerToOuterUV,
 							clockwiseConstraintDegs,
 							antiClockwiseConstraintDegs);
-				} else // Bone is constrained in global coordinate system
-				{
+				} else { // Bone is constrained in global coordinate system
 					constrainedUV = VectorUtil.getConstrainedUV(thisBoneInnerToOuterUV,
 							thisBone.getGlobalConstraintUV(),
 							clockwiseConstraintDegs,
@@ -959,7 +982,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 				// At this stage we have an inner-to-outer unit vector for this bone which is within our constraints,
 				// so we can set the new end location to be the start location of this bone plus the constrained
 				// inner-to-outer direction unit vector multiplied by the length of this bone.
-				Vector2 newEndLocation = thisBone.getStartLocation().cpy().add(constrainedUV.cpy().scl(boneLength));
+				Vector2 newEndLocation = thisBone.getStartLocation().cpy().mulAdd(constrainedUV, boneLength);
 
 				// Set the new end joint location for this bone
 				thisBone.setEndLocation(newEndLocation);
@@ -970,19 +993,17 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 				if(loop < this.mChain.size() - 1) {
 					mChain.get(loop + 1).setStartLocation(newEndLocation);
 				}
-			} else // If we ARE working on the base bone...
-			{
+			} else { // If we ARE working on the base bone...
 				// If the base location is fixed then snap the start location of the base bone back to the fixed base
 				if(mFixedBaseMode) {
 					mChain.get(0).setStartLocation(mBaseLocation);
-				} else // If the base location is not fixed...
-				{
+				} else { // If the base location is not fixed...
 					// ...then set the new base bone start location to be its the end location minus the
 					// bone direction multiplied by the length of the bone (i.e. projected backwards).
 					//float boneZeroLength = mChain.get(0).length();
 					Vector2 boneZeroUV = mChain.get(0).getDirectionUV();
 					Vector2 boneZeroEndLocation = mChain.get(0).getEndLocation();
-					Vector2 newBoneZeroStartLocation = boneZeroEndLocation.cpy().sub(boneZeroUV.cpy().scl(boneLength));
+					Vector2 newBoneZeroStartLocation = boneZeroEndLocation.cpy().mulAdd(boneZeroUV, -boneLength);
 					mChain.get(0).setStartLocation(newBoneZeroStartLocation);
 				}
 
@@ -992,7 +1013,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 					Vector2 thisBoneInnerToOuterUV = thisBone.getDirectionUV();
 
 					// Calculate the new end location as the start location plus the direction times the length of the bone
-					Vector2 newEndLocation = thisBone.getStartLocation().cpy().sub(thisBoneInnerToOuterUV.cpy().scl(boneLength));
+					Vector2 newEndLocation = thisBone.getStartLocation().cpy().mulAdd(thisBoneInnerToOuterUV, boneLength);
 
 					// Set the new end joint location
 					mChain.get(0).setEndLocation(newEndLocation);
@@ -1068,7 +1089,9 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * @param value Whether we should use the embedded target location when solving the IK chain.
 	 */
 	@Override
-	public void setEmbeddedTargetMode(boolean value) {mUseEmbeddedTarget = value;}
+	public void setEmbeddedTargetMode(boolean value) {
+		mUseEmbeddedTarget = value;
+	}
 
 	/**
 	 * Return a concise, human-readable of the IK chain.
@@ -1354,6 +1377,10 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 		return this.mSolveDistanceThreshold;
 	}
 
+	public void setLastBaseLocation(float x, float y) {
+		this.mLastBaseLocation.set(x, y);
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -1482,9 +1509,5 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 			return false;
 		}
 		return true;
-	}
-
-	public void setLastBaseLocation(float x, float y) {
-		this.mLastBaseLocation.set(x, y);
 	}
 } // End of FabrikChain2D class
