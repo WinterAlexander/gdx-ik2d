@@ -203,8 +203,8 @@ public class FabrikStructure2D implements FabrikStructure<FabrikChain2D, Vector2
 		Vector2 connectionLocation;
 		if(connectionPoint == BoneConnectionPoint.START) {
 			connectionLocation = mChains.get(chainNumber).getBone(boneNumber).getStartLocation();
-		} else // If it's BoneConnectionPoint.END then we set the connection point to be the end location of the bone we're connecting to
-		{
+		} else {
+			// If it's BoneConnectionPoint.END then we set the connection point to be the end location of the bone we're connecting to
 			connectionLocation = mChains.get(chainNumber).getBone(boneNumber).getEndLocation();
 		}
 		relativeChain.setBaseLocation(connectionLocation);

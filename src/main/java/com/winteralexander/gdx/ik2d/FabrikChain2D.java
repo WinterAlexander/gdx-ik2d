@@ -258,14 +258,14 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	/**
 	 * Naming constructor.
 	 *
-	 * @param    name    The name of this chain.
+	 * @param name The name of this chain.
 	 */
 	public FabrikChain2D(String name) {mName = name;}
 
 	/**
 	 * Copy constructor.
 	 *
-	 * @param    source    The FabrikChain2D to use as the basis for this new FabrikChain2D.
+	 * @param source The FabrikChain2D to use as the basis for this new FabrikChain2D.
 	 */
 	public FabrikChain2D(FabrikChain2D source) {
 		// Force copy by value
@@ -299,9 +299,9 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * In addition, if the bone being added is the very first bone, then this chain's
 	 * {@link #mBaseLocation} property is set from the start joint location of the bone.
 	 *
-	 * @param    bone    The FabrikBone2D object to add to this FabrikChain2D.
-	 * @see        #mChainLength
-	 * @see        #mBaseLocation
+	 * @param bone The FabrikBone2D object to add to this FabrikChain2D.
+	 * @see #mChainLength
+	 * @see #mBaseLocation
 	 */
 	@Override
 	public void addBone(FabrikBone2D bone) {
@@ -334,22 +334,21 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * <p>
 	 * Specifying a direction unit vector of zero will result in an IllegalArgumentException being thrown.
 	 *
-	 * @param    directionUV            The initial direction of the new bone
-	 * @param    length                The length of the new bone
-	 * @param    clockwiseDegs        The clockwise constraint angle in degrees.
-	 * @param    anticlockwiseDegs    The anti-clockwise constraint angle in degrees.
+	 * @param directionUV       The initial direction of the new bone
+	 * @param length            The length of the new bone
+	 * @param clockwiseDegs     The clockwise constraint angle in degrees.
+	 * @param anticlockwiseDegs The anti-clockwise constraint angle in degrees.
 	 */
 	public void addConsecutiveConstrainedBone(Vector2 directionUV, float length, float clockwiseDegs, float anticlockwiseDegs) {
 		// Validate the direction unit vector - throws an IllegalArgumentException if it has a magnitude of zero
 		// Ensure that the magnitude of this direction unit vector is greater than zero
-		if ( directionUV.len2() <= 0.0f )
-		{
+		if(directionUV.len2() <= 0.0f) {
 			throw new IllegalArgumentException("Vec2f direction unit vector cannot be zero.");
 		}
 
 		// Validate the length of the bone - throws an IllegalArgumentException if it is not a positive value
 		// Ensure that the magnitude of this direction unit vector is not zero
-		if (length < 0.0f)
+		if(length < 0.0f)
 			throw new IllegalArgumentException("Length must be a greater than or equal to zero.");
 
 		// If we have at least one bone already in the chain...
@@ -376,8 +375,8 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * <p>
 	 * Specifying a direction unit vector of zero will result in an IllegalArgumentException being thrown.
 	 *
-	 * @param    directionUV            The initial direction of the new bone
-	 * @param    length                The length of the new bone
+	 * @param directionUV The initial direction of the new bone
+	 * @param length      The length of the new bone
 	 */
 	@Override
 	public void addConsecutiveBone(Vector2 directionUV, float length) {
@@ -395,23 +394,21 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * <p>
 	 * Specifying a direction unit vector of zero will result in an IllegalArgumentException being thrown.
 	 *
-	 * @param    bone            The bone to add to the end of this chain.
+	 * @param bone The bone to add to the end of this chain.
 	 */
 	@Override
 	public void addConsecutiveBone(FabrikBone2D bone) {
 		// Validate the direction unit vector - throws an IllegalArgumentException if it has a magnitude of zero
 		Vector2 dir = bone.getDirectionUV();
 		// Ensure that the magnitude of this direction unit vector is greater than zero
-		if ( dir.len2() <= 0.0f )
-		{
+		if(dir.len2() <= 0.0f) {
 			throw new IllegalArgumentException("Vec2f direction unit vector cannot be zero.");
 		}
 
 		// Validate the length of the bone - throws an IllegalArgumentException if it is not a positive value
 		float len = bone.length();
 		// Ensure that the magnitude of this direction unit vector is not zero
-		if (len < 0.0f)
-		{
+		if(len < 0.0f) {
 			throw new IllegalArgumentException("Length must be a greater than or equal to zero.");
 		}
 
@@ -470,7 +467,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * <p>
 	 * The base bone is always bone 0, each additional bone increases the number by 1.
 	 *
-	 * @param    boneNumber    The number of the bone to return from the Vector of FabrikBone2D objects.
+	 * @param boneNumber The number of the bone to return from the Vector of FabrikBone2D objects.
 	 * @return The FabrikBone2D at the given location in this chain.
 	 */
 	@Override
@@ -598,9 +595,9 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * <p>
 	 * If this chain does not contain a bone at the specified location then an IllegalArgumentException is thrown.
 	 *
-	 * @param    boneNumber    The zero-indexed bone to remove from this IK chain.
-	 * @see        #mChainLength
-	 * @see        #mBaseLocation
+	 * @param boneNumber The zero-indexed bone to remove from this IK chain.
+	 * @see #mChainLength
+	 * @see #mBaseLocation
 	 */
 	@Override
 	public void removeBone(int boneNumber) {
@@ -637,8 +634,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	public void setBaseboneConstraintUV(Vector2 constraintUV) {
 		// Sanity checking
 		// Ensure that the magnitude of this direction unit vector is greater than zero
-		if ( constraintUV.len2() <= 0.0f )
-		{
+		if(constraintUV.len2() <= 0.0f) {
 			throw new IllegalArgumentException("Vec2f direction unit vector cannot be zero.");
 		}
 
@@ -649,8 +645,8 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	/**
 	 * Set the base location of this chain.
 	 *
-	 * @param    baseLocation    The location to set the mBaseLocation property.
-	 * @see        #mBaseLocation
+	 * @param baseLocation The location to set the mBaseLocation property.
+	 * @see #mBaseLocation
 	 */
 	public void setBaseLocation(Vector2 baseLocation) {mBaseLocation.set(baseLocation);}
 
@@ -662,15 +658,15 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * <p>
 	 * This property is held per-chain rather than per-bone for efficiency.
 	 *
-	 * @param    boneConnectionPoint    The BoneConnectionPoint to set on this chain.
+	 * @param boneConnectionPoint The BoneConnectionPoint to set on this chain.
 	 */
 	public void setBoneConnectionPoint(BoneConnectionPoint boneConnectionPoint) {mBoneConnectionPoint = boneConnectionPoint;}
 
 	/**
 	 * Set the List%lt;FabrikBone2D%gt; of this FabrikChain2D to the provided list by reference.
 	 *
-	 * @param    chain    The List%lt;FabrikBone2D%gt; of FabrikBone2D objects to assign to this chain.
-	 * @see        #mChain
+	 * @param chain The List%lt;FabrikBone2D%gt; of FabrikBone2D objects to assign to this chain.
+	 * @see #mChain
 	 */
 	public void setChain(List<FabrikBone2D> chain) {
 		// Assign this chain to be a reference to the chain provided as an argument to this method
@@ -680,14 +676,14 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	/**
 	 * Set which number bone this chain is connected to in another chain in a FabrikStructure2D object.
 	 *
-	 * @param    boneNumber    The number of the bone this chain is connected to.
+	 * @param boneNumber The number of the bone this chain is connected to.
 	 */
 	void setConnectedBoneNumber(int boneNumber) {mConnectedBoneNumber = boneNumber;}
 
 	/**
 	 * Set which number chain this chain is connected to in a FabrikStructure2D object.
 	 *
-	 * @param    chainNumber    The number of the chain that this chain is connected to.
+	 * @param chainNumber The number of the chain that this chain is connected to.
 	 */
 	void setConnectedChainNumber(int chainNumber) {mConnectedChainNumber = chainNumber;}
 
@@ -768,11 +764,12 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	/**
 	 * Set the name of this chain, capped to 100 characters if required.
 	 *
-	 * @param    name    The name to set.
+	 * @param name The name to set.
 	 */
 	@Override
 	public void setName(String name) {
-		mName = name;}
+		mName = name;
+	}
 
 	/**
 	 * Set the distance threshold within which we consider the IK chain to be solved.
@@ -1068,7 +1065,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	/**
 	 * Specify whether we should use the embedded target location when solving the IK chain.
 	 *
-	 * @param    value    Whether we should use the embedded target location when solving the IK chain.
+	 * @param value Whether we should use the embedded target location when solving the IK chain.
 	 */
 	@Override
 	public void setEmbeddedTargetMode(boolean value) {mUseEmbeddedTarget = value;}
@@ -1092,7 +1089,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 			sb.append("No.").append("\n");
 		}
 
-		sb.append("Base location: " + getBaseLocation());
+		sb.append("Base location: ").append(getBaseLocation());
 
 		return sb.toString();
 	}
@@ -1287,8 +1284,8 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 				if(solveDistance <= mSolveDistanceThreshold) {
 					break;
 				}
-			} else // Did not solve to our satisfaction? Okay...
-			{
+			} else { // Did not solve to our satisfaction? Okay...
+
 				// Did we grind to a halt? If so then it's time to break out of the loop.
 				if(Math.abs(solveDistance - lastPassSolveDistance) < mMinIterationChange) {
 					break;
@@ -1318,7 +1315,6 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 		return mCurrentSolveDistance;
 	}
 
-
 	/**
 	 * Return the relative constraint UV about which this bone connects to a bone in another chain.
 	 *
@@ -1330,7 +1326,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	/**
 	 * Set the constraint UV about which this bone connects to a bone in another chain.
 	 *
-	 * @param    constraintUV    The basebone relative constraint unit vector to set.
+	 * @param constraintUV The basebone relative constraint unit vector to set.
 	 */
 	public void setBaseboneRelativeConstraintUV(Vector2 constraintUV) {mBaseboneRelativeConstraintUV.set(constraintUV);}
 
@@ -1488,5 +1484,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 		return true;
 	}
 
-
+	public void setLastBaseLocation(float x, float y) {
+		this.mLastBaseLocation.set(x, y);
+	}
 } // End of FabrikChain2D class
