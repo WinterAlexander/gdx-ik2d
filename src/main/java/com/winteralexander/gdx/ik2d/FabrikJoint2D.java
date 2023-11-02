@@ -120,8 +120,6 @@ public class FabrikJoint2D implements FabrikJoint<FabrikJoint2D> {
 		mConstraintCoordinateSystem = constraintCoordSystem;
 	}
 
-	// ---------- Methods ----------
-
 	/**
 	 * Set the constraint angles of this FabrikJoint2D to match those of a source FabrikJoint2D,
 	 * essentially making a copy of the source joint.

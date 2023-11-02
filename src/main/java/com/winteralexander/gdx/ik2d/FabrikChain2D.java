@@ -1,10 +1,8 @@
 package com.winteralexander.gdx.ik2d;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.winteralexander.gdx.ik2d.FabrikChain2D.BaseboneConstraintType2D;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Class to represent a 2D Inverse Kinematics (IK) chain that can be solved for a given target using the FABRIK algorithm.
@@ -38,7 +36,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * The core of a FabrikChain2D is a list of FabrikBone2D objects, where each bone contains a start and end location, and a joint
 	 * that stores any rotational constraints.
 	 */
-	private List<FabrikBone2D> chain = new ArrayList<>();
+	private final Array<FabrikBone2D> chain = new Array<>();
 
 	/**
 	 * The distance threshold we must meet in order to consider this FabrikChain2D to be successfully solved for distance.
@@ -244,7 +242,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 */
 	public FabrikChain2D(FabrikChain2D source) {
 		// Force copy by value
-		chain = source.cloneChainVector();
+		chain.addAll(source.cloneChainVector());
 		baseLocation.set(source.baseLocation);
 		lastTargetLocation.set(source.lastTargetLocation);
 		lastBaseLocation.set(source.lastBaseLocation);
@@ -283,7 +281,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 		chain.add(bone);
 
 		// If this is the basebone...
-		if(this.chain.size() == 1) {
+		if(this.chain.size == 1) {
 			// ...then keep a copy of the fixed start location...
 			baseLocation.set(bone.getStartLocation());
 
@@ -328,7 +326,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 		// If we have at least one bone already in the chain...
 		if(!this.chain.isEmpty()) {
 			// Get the end location of the last bone, which will be used as the start location of the new bone
-			Vector2 prevBoneEnd = chain.get(this.chain.size() - 1).getEndLocation();
+			Vector2 prevBoneEnd = chain.get(this.chain.size - 1).getEndLocation();
 
 			// Add a bone to the end of this IK chain
 			addBone(new FabrikBone2D(prevBoneEnd, directionUV.nor(), length, clockwiseDegs, anticlockwiseDegs));
@@ -389,7 +387,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 		// If we have at least one bone already in the chain...
 		if(!this.chain.isEmpty()) {
 			// Get the end location of the last bone, which will be used as the start location of the new bone
-			Vector2 prevBoneEnd = chain.get(this.chain.size() - 1).getEndLocation();
+			Vector2 prevBoneEnd = chain.get(this.chain.size - 1).getEndLocation();
 
 			bone.setStartLocation(prevBoneEnd);
 			bone.getEndLocation().set(prevBoneEnd).mulAdd(dir, len);
@@ -465,7 +463,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * @return The IK chain of this FabrikChain2D as a List of FabrikBone2D objects.
 	 */
 	@Override
-	public List<FabrikBone2D> getChain() {
+	public Array<FabrikBone2D> getChain() {
 		return chain;
 	}
 
@@ -515,7 +513,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	@Override
 	public Vector2 getEffectorLocation() {
 		if(!this.chain.isEmpty()) {
-			return chain.get(this.chain.size() - 1).getEndLocation();
+			return chain.get(this.chain.size - 1).getEndLocation();
 		} else {
 			throw new RuntimeException("Cannot get effector location as there are zero bones in the chain.");
 		}
@@ -564,7 +562,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 */
 	@Override
 	public int getNumBones() {
-		return this.chain.size();
+		return this.chain.size;
 	}
 
 	/**
@@ -583,9 +581,9 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	@Override
 	public void removeBone(int boneNumber) {
 		// If the bone number is a bone which exists...
-		if(boneNumber < this.chain.size()) {
+		if(boneNumber < this.chain.size) {
 			// ...then remove the bone, decrease the bone count and update the chain length.
-			chain.remove(boneNumber);
+			chain.removeIndex(boneNumber);
 			updateChainLength();
 		} else {
 			throw new IllegalArgumentException("Bone " + boneNumber + " does not exist in this chain.");
@@ -648,9 +646,10 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * @param chain The List%lt;FabrikBone2D%gt; of FabrikBone2D objects to assign to this chain.
 	 * @see #chain
 	 */
-	public void setChain(List<FabrikBone2D> chain) {
+	public void setChain(Array<FabrikBone2D> chain) {
 		// Assign this chain to be a reference to the chain provided as an argument to this method
-		this.chain = chain;
+		this.chain.clear();
+		this.chain.addAll(chain);
 	}
 
 	/**
@@ -786,18 +785,18 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 		// ---------- Step 1 of 2 - Forward pass from end-effector to base -----------
 
 		// Loop over all bones in the chain, from the end effector (numBones-1) back to the base bone (0)		
-		for(int loop = this.chain.size() - 1; loop >= 0; --loop) {
+		for(int loop = this.chain.size - 1; loop >= 0; --loop) {
 			// Get this bone
-			FabrikBone2D thisBone = chain.get(loop);
+			FabrikBone2D bone = chain.get(loop);
 
 			// Get the length of the bone we're working on
-			float boneLength = thisBone.length();
+			float boneLength = bone.length();
 
 			// If we are not working on the end effector bone
-			if(loop != this.chain.size() - 1) {
+			if(loop != this.chain.size - 1) {
 				FabrikBone2D outerBone = chain.get(loop + 1);
 
-				tmpDir.set(thisBone.getDirectionUV()).scl(-1f);
+				tmpDir.set(bone.getDirectionUV()).scl(-1f);
 
 				// Constrain the angle between the outer bone and this bone.
 				// Note: On the forward pass we constrain to the limits imposed by joint of the outer bone.
@@ -807,7 +806,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 				if(chain.get(loop).getJointConstraintCoordinateSystem() == FabrikJoint2D.ConstraintCoordinateSystem.LOCAL)
 					tmpOuterDir.set(outerBone.getDirectionUV()).scl(-1f);
 				else
-					tmpOuterDir.set(thisBone.getGlobalConstraintUV()).scl(-1f);
+					tmpOuterDir.set(bone.getGlobalConstraintUV()).scl(-1f);
 
 				VectorUtil.getConstrainedUV(tmpDir,
 						tmpOuterDir,
@@ -817,26 +816,26 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 			} else {
 				// If we are working on the end effector bone ...
 				// Snap the end effector's end location to the target
-				thisBone.getEndLocation().set(targetX, targetY);
+				bone.getEndLocation().set(targetX, targetY);
 
 				// Get the UV between the target / end-location (which are now the same) and the start location of this bone
-				tmpDir.set(thisBone.getDirectionUV()).scl(-1.0f);
+				tmpDir.set(bone.getDirectionUV()).scl(-1.0f);
 
 				if(loop > 0) {
 					// The end-effector bone is NOT the basebone as well
 
 					// Constrain the angle between the this bone and the inner bone
 					// Note: On the forward pass we constrain to the limits imposed by the first joint of the inner bone.
-					float clockwiseConstraintDegs = thisBone.getJoint().getClockwiseConstraintDegs();
-					float antiClockwiseConstraintDegs = thisBone.getJoint().getAnticlockwiseConstraintDegs();
+					float clockwiseConstraintDegs = bone.getJoint().getClockwiseConstraintDegs();
+					float antiClockwiseConstraintDegs = bone.getJoint().getAnticlockwiseConstraintDegs();
 
 					// If this bone is locally constrained...
-					if(thisBone.getJoint().getConstraintCoordinateSystem() == FabrikJoint2D.ConstraintCoordinateSystem.LOCAL) {
+					if(bone.getJoint().getConstraintCoordinateSystem() == FabrikJoint2D.ConstraintCoordinateSystem.LOCAL) {
 						// Get the outer-to-inner unit vector of the bone further in
 						tmpInnerDir.set(chain.get(loop - 1).getDirectionUV()).scl(-1.0f);
 					} else {
 						// End effector bone is globally constrained
-						tmpInnerDir.set(thisBone.getGlobalConstraintUV()).scl(-1.0f);
+						tmpInnerDir.set(bone.getGlobalConstraintUV()).scl(-1.0f);
 					}
 					// Params: directionUV, baselineUV, clockwise, anticlockwise
 					VectorUtil.getConstrainedUV(tmpDir,
@@ -848,15 +847,15 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 					// There is only one bone in the chain, and the bone is both the basebone and the end-effector bone.
 
 					// Don't constraint (nothing to constraint against) if constraint is in local coordinate system
-					if(thisBone.getJointConstraintCoordinateSystem() == FabrikJoint2D.ConstraintCoordinateSystem.LOCAL) {
+					if(bone.getJointConstraintCoordinateSystem() == FabrikJoint2D.ConstraintCoordinateSystem.LOCAL) {
 						tmpConstrainedUV.set(tmpDir);
 					} else {
 						// Can constrain if constraining against global coordinate system
-						tmpInnerDir.set(thisBone.getGlobalConstraintUV()).scl(-1.0f);
+						tmpInnerDir.set(bone.getGlobalConstraintUV()).scl(-1.0f);
 						VectorUtil.getConstrainedUV(tmpDir,
 								tmpInnerDir,
-								thisBone.getClockwiseConstraintDegs(),
-								thisBone.getAnticlockwiseConstraintDegs(),
+								bone.getClockwiseConstraintDegs(),
+								bone.getAnticlockwiseConstraintDegs(),
 								tmpConstrainedUV);
 					}
 				}
@@ -871,7 +870,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 			// Calculate the new start joint location as the end joint location plus the outer-to-inner direction UV
 			// multiplied by the length of the bone.
 			// Set the new start joint location for this bone to be new start location...
-			thisBone.getStartLocation().set(thisBone.getEndLocation()).mulAdd(tmpConstrainedUV, boneLength);
+			bone.getStartLocation().set(bone.getEndLocation()).mulAdd(tmpConstrainedUV, boneLength);
 
 			// EITHER
 			// If we are not working on the base bone, then we set the end joint location of
@@ -880,14 +879,14 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 			// OR
 			// ...and set the end joint location of the bone further in to also be at the new start location.
 			if(loop > 0) {
-				chain.get(loop - 1).setEndLocation(thisBone.getStartLocation());
+				chain.get(loop - 1).setEndLocation(bone.getStartLocation());
 			}
 
 		} // End of forward-pass loop over all bones
 
 		// ---------- Step 2 of 2 - Backward pass from base to end effector -----------
 
-		for(int loop = 0; loop < this.chain.size(); ++loop) {
+		for(int loop = 0; loop < this.chain.size; ++loop) {
 			// Get the length of the bone we're working on
 			float boneLength = chain.get(loop).length();
 
@@ -924,7 +923,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 				// If we are not working on the end bone, then we set the start joint location of
 				// the next bone in the chain (i.e. the bone closer to the end effector) to be the
 				// new end joint location of this bone also.
-				if(loop < this.chain.size() - 1) {
+				if(loop < this.chain.size - 1) {
 					chain.get(loop + 1).setStartLocation(thisBone.getEndLocation());
 				}
 			} else { // If we ARE working on the base bone...
@@ -948,7 +947,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 					chain.get(0).getEndLocation().set(thisBone.getStartLocation()).mulAdd(thisBone.getDirectionUV(), boneLength);
 
 					// Also, set the start location of the next bone to be the end location of this bone
-					if(chain.size() > 1) {
+					if(chain.size > 1) {
 						chain.get(1).setStartLocation(chain.get(0).getEndLocation());
 					}
 				} else {
@@ -990,7 +989,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 					// If we are not working on the end bone, then we set the start joint location of
 					// the next bone in the chain (i.e. the bone closer to the end effector) to be the
 					// new end joint location of this bone.
-					if(loop < this.chain.size() - 1) {
+					if(loop < this.chain.size - 1) {
 						chain.get(loop + 1).setStartLocation(chain.get(loop).getEndLocation());
 					}
 
@@ -1003,11 +1002,9 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 		// Update our last target location
 		lastTargetLocation.set(targetX, targetY);
 
-		// Finally, get the current effector location...
-		Vector2 currentEffectorLocation = chain.get(this.chain.size() - 1).getEndLocation();
-
-		// ...and calculate and return the distance between the current effector location and the target.
-		return currentEffectorLocation.dst(targetX, targetY);
+		// Finally, get the current effector location and calculate the distance between the
+		// current effector location and the target.
+		return chain.get(this.chain.size - 1).getEndLocation().dst(targetX, targetY);
 	}
 
 	/**
@@ -1030,7 +1027,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("----- FabrikChain2D -----\n");
-		sb.append("Number of bones: ").append(this.chain.size()).append("\n");
+		sb.append("Number of bones: ").append(this.chain.size).append("\n");
 
 		sb.append("Fixed base mode: ");
 		if(fixedBaseMode) {
@@ -1053,12 +1050,12 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 *
 	 * @return The clones list of FabrikBone2D objects
 	 */
-	private List<FabrikBone2D> cloneChainVector() {
+	private Array<FabrikBone2D> cloneChainVector() {
 		// How many bones are in this chain?
-		int numBones = chain.size();
+		int numBones = chain.size;
 
 		// Create a new Vector of FabrikBone2D objects large enough to contain all the bones in this chain
-		List<FabrikBone2D> clonedChain = new ArrayList<>(numBones);
+		Array<FabrikBone2D> clonedChain = new Array<>(numBones);
 
 		// For each bone in the chain being cloned...		
 		for(FabrikBone2D fabrikBone2D : chain) {
@@ -1198,21 +1195,20 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 
 		// Keep starting solutions and distance
 		float startingDistance;
-		List<FabrikBone2D> startingSolution = null;
+		Array<FabrikBone2D> startingSolution = null;
 
 		// If the base location of a chain hasn't moved then we may opt to keep the current solution if our 
 		// best new solution is worse...
 		if(lastBaseLocation.epsilonEquals(baseLocation, 0.001f)) {
-			startingDistance = chain.get(chain.size() - 1).getEndLocation().dst(targetX, targetY);
+			startingDistance = chain.get(chain.size - 1).getEndLocation().dst(targetX, targetY);
 			startingSolution = this.cloneChainVector();
-		} else // Base has changed? Then we have little choice but to recalc the solution and take that new solution.
-		{
+		} else { // Base has changed? Then we have little choice but to recalc the solution and take that new solution.
 			startingDistance = Float.MAX_VALUE;
 		}
 
 		// Not the same target? Then we must solve the chain for the new target.
 		// We'll start by creating a list of bones to store our best solution
-		List<FabrikBone2D> bestSolution = new ArrayList<>(this.chain.size());
+		Array<FabrikBone2D> bestSolution = new Array<>(this.chain.size);
 
 		// We'll keep track of our best solve distance, starting it at a huge value which will be beaten on first attempt			
 		float bestSolveDistance = Float.MAX_VALUE;
@@ -1250,11 +1246,12 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 		if(bestSolveDistance < startingDistance) {
 			// If so, set the newly found solve distance and solution as the best found.
 			currentSolveDistance = bestSolveDistance;
-			chain = bestSolution;
-		} else // Did we make things worse? Then we keep our starting distance and solution!
-		{
+			chain.clear();
+			chain.addAll(bestSolution);
+		} else { // Did we make things worse? Then we keep our starting distance and solution!
 			currentSolveDistance = startingDistance;
-			chain = startingSolution;
+			chain.clear();
+			chain.addAll(startingSolution);
 		}
 
 		// Update our last base and target locations so we know whether we need to solve for this start/end configuration next time

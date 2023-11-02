@@ -3,6 +3,7 @@ package com.winteralexander.gdx.ik2d;
 import java.util.List;
 
 import com.badlogic.gdx.math.Vector;
+import com.badlogic.gdx.utils.Array;
 
 @SuppressWarnings("rawtypes")
 public interface FabrikChain<
@@ -110,7 +111,7 @@ public interface FabrikChain<
 	 *
 	 * @return The IK chain of this FabrikChain as a List of FabrikBone objects.
 	 */
-	List<B> getChain();
+	Array<B> getChain();
 
 	/**
 	 * Return the current length of this IK chain.

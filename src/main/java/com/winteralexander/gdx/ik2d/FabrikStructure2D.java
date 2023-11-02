@@ -1,9 +1,7 @@
 package com.winteralexander.gdx.ik2d;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.winteralexander.gdx.ik2d.FabrikChain2D.BaseboneConstraintType2D;
 
 /**
@@ -27,7 +25,7 @@ public class FabrikStructure2D implements FabrikStructure<FabrikChain2D, Vector2
 	/**
 	 * The main substance of a FabrikStructure2D is an ArrayList of FabrikChain2D objects.
 	 */
-	private final List<FabrikChain2D> chains = new ArrayList<>();
+	private final Array<FabrikChain2D> chains = new Array<>();
 
 	/**
 	 * Property to indicate if the first chain (chain zero) in this structure has its basebone fixed in place or not.
@@ -142,7 +140,7 @@ public class FabrikStructure2D implements FabrikStructure<FabrikChain2D, Vector2
 	@Override
 	public void connectChain(FabrikChain2D chain, int chainNumber, int boneNumber) {
 		// Does this chain exist? If not throw an IllegalArgumentException
-		if(chainNumber >= this.chains.size()) {
+		if(chainNumber >= this.chains.size) {
 			throw new IllegalArgumentException("Cannot connect to chain " + chainNumber + " - no such chain (remember that chains are zero indexed).");
 		}
 
@@ -211,7 +209,7 @@ public class FabrikStructure2D implements FabrikStructure<FabrikChain2D, Vector2
 	 */
 	@Override
 	public int getNumChains() {
-		return this.chains.size();
+		return this.chains.size;
 	}
 
 	/**
@@ -250,7 +248,7 @@ public class FabrikStructure2D implements FabrikStructure<FabrikChain2D, Vector2
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("----- FabrikStructure2D -----\n");
-		sb.append("Number of chains: ").append(this.chains.size()).append("\n");
+		sb.append("Number of chains: ").append(this.chains.size).append("\n");
 		for(FabrikChain2D chain : this.chains) {
 			sb.append(chain.toString());
 		}
@@ -262,7 +260,7 @@ public class FabrikStructure2D implements FabrikStructure<FabrikChain2D, Vector2
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((chains == null) ? 0 : chains.hashCode());
+		result = prime * result + chains.hashCode();
 		result = prime * result + (fixedBaseMode ? 1231 : 1237);
 		return result;
 	}
