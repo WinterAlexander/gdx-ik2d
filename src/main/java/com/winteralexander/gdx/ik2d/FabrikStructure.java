@@ -8,10 +8,9 @@ import com.badlogic.gdx.math.Vector;
  * @author jsalvo
  *
  */
-//@SuppressWarnings("rawtypes")
+@SuppressWarnings("rawtypes")
 public interface FabrikStructure<T extends FabrikChain, V extends Vector<V>>
 {
-	
   /**
    * Add a FabrikChain object to a FabrikStructure object.
    * <p>
@@ -21,7 +20,7 @@ public interface FabrikStructure<T extends FabrikChain, V extends Vector<V>>
    *  
    * @param  chain	The chain to add to this structure.
    **/
-  public void addChain(T chain);
+  void addChain(T chain);
   
   /**
    * Connect a chain to an existing chain in this structure.
@@ -35,7 +34,7 @@ public interface FabrikStructure<T extends FabrikChain, V extends Vector<V>>
    * @param	existingChainNumber	The index of the chain to connect the new chain to.
    * @param	existingBoneNumber	The index of the bone to connect the new chain to within the existing chain.
    */
-  public void connectChain(T newChain, int existingChainNumber, int existingBoneNumber);
+  void connectChain(T newChain, int existingChainNumber, int existingBoneNumber);
   
   /**
    * Connect a chain to an existing chain in this structure.
@@ -50,7 +49,7 @@ public interface FabrikStructure<T extends FabrikChain, V extends Vector<V>>
    * @param	existingBoneNumber	The index of the bone to connect the new chain to within the existing chain.
    * @param	boneConnectionPoint	Whether the new chain should connect to the START or END of the specified bone in the specified chain.
    */
-  public void connectChain(T newChain, int existingChainNumber, int existingBoneNumber, BoneConnectionPoint boneConnectionPoint);	
+  void connectChain(T newChain, int existingChainNumber, int existingBoneNumber, BoneConnectionPoint boneConnectionPoint);
   
   /**
    * Return a chain which exists in this structure.
@@ -60,26 +59,14 @@ public interface FabrikStructure<T extends FabrikChain, V extends Vector<V>>
    * @param	chainNumber	The zero-indexed chain in this structure to return.
    * @return				The desired chain.
    */
-  public T getChain(int chainNumber);
-  
-  /**
-   * @return The name for this structure
-   */
-  public String getName();
+  T getChain(int chainNumber);
   
   /**
    * Return the number of chains in this structure.
    * 
    * @return  The number of chains in this structure.
    */
-  public int getNumChains();
-  
-  /** 
-   * Set the name of this structure, capped to 100 characters if required.
-   * 
-   * @param name  The name to set.
-   */
-  public void setName(String name);
+  int getNumChains();
   
   /**
    * Solve the structure for the given target location.
@@ -91,6 +78,5 @@ public interface FabrikStructure<T extends FabrikChain, V extends Vector<V>>
    *  
    * @param   newTargetLocation The location of the target for which we will attempt to solve all chains attached to this structure.
    */
-  public void solveForTarget(V newTargetLocation);
-
+  void solveForTarget(V newTargetLocation);
 }

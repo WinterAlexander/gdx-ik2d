@@ -1,7 +1,5 @@
 package com.winteralexander.gdx.ik2d;
 
-import java.io.Serializable;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,52 +20,21 @@ import com.winteralexander.gdx.ik2d.FabrikChain2D.BaseboneConstraintType2D;
  * @version 1.1 - 19/06/2019
  **/
 
-public class FabrikStructure2D implements FabrikStructure<FabrikChain2D, Vector2>, Serializable {
-	private static final long serialVersionUID = 1L;
+public class FabrikStructure2D implements FabrikStructure<FabrikChain2D, Vector2> {
 
 	private static final Vector2 UP = new Vector2(0.0f, 1.0f);
-
-	// ---------- Private Properties ----------
-
-	/**
-	 * The string name of this FabrikStructure2D - can be used for creating Maps, if required.
-	 */
-	private String mName;
 
 	/**
 	 * The main substance of a FabrikStructure2D is an ArrayList of FabrikChain2D objects.
 	 */
-	private final List<FabrikChain2D> mChains = new ArrayList<>();
+	private final List<FabrikChain2D> chains = new ArrayList<>();
 
 	/**
 	 * Property to indicate if the first chain (chain zero) in this structure has its basebone fixed in place or not.
 	 */
-	private boolean mFixedBaseMode = true;
+	private boolean fixedBaseMode = true;
 
-	// --------- Public Methods ----------
-
-	/**
-	 * Default constructor.
-	 */
 	public FabrikStructure2D() {}
-
-	/**
-	 * Naming constructor.
-	 * <p>
-	 * Names lengths are limited to 100 characters and are truncated if necessary.
-	 *
-	 * @param    name    The name you wish to call the structure.
-	 */
-	public FabrikStructure2D(String name) {setName(name);}
-
-	/**
-	 * Set the name of this structure, capped to 100 characters if required.
-	 *
-	 * @param    name    The name to set.
-	 */
-	@Override
-	public void setName(String name) {
-		mName = name;}
 
 	/**
 	 * Solve the structure for the given target location.
@@ -81,41 +48,38 @@ public class FabrikStructure2D implements FabrikStructure<FabrikChain2D, Vector2
 	 */
 	@Override
 	public void solveForTarget(Vector2 newTargetLocation) {
-		int numChains = mChains.size();
 		int hostChainNumber;
-		FabrikChain2D thisChain;
 
-		for(int loop = 0; loop < numChains; ++loop) {
-			thisChain = mChains.get(loop);
+		for(FabrikChain2D chain : chains) {
 
 			// Is this chain connected to another chain?
-			hostChainNumber = thisChain.getConnectedChainNumber();
+			hostChainNumber = chain.getConnectedChainNumber();
 
 			// Get the basebone constraint type of the chain we're working on
-			BaseboneConstraintType2D constraintType = thisChain.getBaseboneConstraintType();
+			BaseboneConstraintType2D constraintType = chain.getBaseboneConstraintType();
 
 			// If this chain is not connected to another chain and the basebone constraint type of this chain is not global absolute
 			// then we must update the basebone constraint UV for LOCAL_RELATIVE and the basebone relative constraint UV for LOCAL_ABSOLUTE connection types.
 			// Note: For NONE or GLOBAL_ABSOLUTE we don't need to update anything before calling updateTarget().
 			if(hostChainNumber != -1 && constraintType != BaseboneConstraintType2D.GLOBAL_ABSOLUTE) {
 				// Get the bone which this chain is connected to in the 'host' chain
-				FabrikBone2D hostBone = mChains.get(hostChainNumber).getBone(mChains.get(loop).getConnectedBoneNumber());
+				FabrikBone2D hostBone = chains.get(hostChainNumber).getBone(chain.getConnectedBoneNumber());
 
 				// If we're connecting this chain to the start location of the bone in the 'host' chain...
-				if(thisChain.getBoneConnectionPoint() == BoneConnectionPoint.START) {
+				if(chain.getBoneConnectionPoint() == BoneConnectionPoint.START) {
 					// ...set the base location of this bone to be the start location of the bone it's connected to.
-					thisChain.setBaseLocation(hostBone.getStartLocation());
+					chain.setBaseLocation(hostBone.getStartLocation());
 				} else // If the bone connection point is BoneConnectionPoint.END...
 				{
 					// ...set the base location of the chain to be the end location of the bone we're connecting to.
-					thisChain.setBaseLocation(hostBone.getEndLocation());
+					chain.setBaseLocation(hostBone.getEndLocation());
 				}
 
 				// If the basebone is constrained to the direction of the bone it's connected to...
 				Vector2 hostBoneUV = hostBone.getDirectionUV();
 				if(constraintType == BaseboneConstraintType2D.LOCAL_RELATIVE) {
 					// ...then set the basebone constraint UV to be the direction of the bone we're connected to.
-					mChains.get(loop).setBaseboneConstraintUV(hostBoneUV);
+					chain.setBaseboneConstraintUV(hostBoneUV);
 				} else if(constraintType == BaseboneConstraintType2D.LOCAL_ABSOLUTE) {
 					// Note: LOCAL_ABSOLUTE directions are directions which are in the local coordinate system of the host bone.
 					// For example, if the baseboneConstraintUV is Vec2f(-1.0f, 0.0f) [i.e. left], then the baseboneConnectionConstraintUV
@@ -124,11 +88,8 @@ public class FabrikStructure2D implements FabrikStructure<FabrikChain2D, Vector2
 					// Get the angle between UP and the hostbone direction
 					float angleDegs = VectorUtil.getSignedAngleDegsTo(UP, hostBoneUV);
 
-					// ...then apply that same rotation to this chain's basebone constraint UV to get the relative constraint UV... 
-					Vector2 relativeConstraintUV = thisChain.getBaseboneConstraintUV().cpy().rotateDeg(angleDegs);
-
-					// ...which we then update.
-					thisChain.setBaseboneRelativeConstraintUV(relativeConstraintUV);
+					// ...then apply that same rotation to this chain's basebone constraint UV to get the relative constraint UV...
+					chain.getBaseboneRelativeConstraintUV().set(chain.getBaseboneConstraintUV()).rotateDeg(angleDegs);
 				}
 
 				// NOTE: If the basebone constraint type is NONE then we don't do anything with the basebone constraint of the connected chain.
@@ -136,10 +97,10 @@ public class FabrikStructure2D implements FabrikStructure<FabrikChain2D, Vector2
 			} // End of if chain is connected to another chain section
 
 			// Update the target and solve the chain
-			if(!thisChain.getEmbeddedTargetMode()) {
-				thisChain.solveForTarget(newTargetLocation);
+			if(!chain.getEmbeddedTargetMode()) {
+				chain.solveForTarget(newTargetLocation);
 			} else {
-				thisChain.solveForEmbeddedTarget();
+				chain.solveForEmbeddedTarget();
 			}
 
 		} // End of loop over chains
@@ -157,7 +118,7 @@ public class FabrikStructure2D implements FabrikStructure<FabrikChain2D, Vector2
 	 **/
 	@Override
 	public void addChain(FabrikChain2D chain) {
-		mChains.add(chain);
+		chains.add(chain);
 	}
 
 	/**
@@ -181,12 +142,12 @@ public class FabrikStructure2D implements FabrikStructure<FabrikChain2D, Vector2
 	@Override
 	public void connectChain(FabrikChain2D chain, int chainNumber, int boneNumber) {
 		// Does this chain exist? If not throw an IllegalArgumentException
-		if(chainNumber >= this.mChains.size()) {
+		if(chainNumber >= this.chains.size()) {
 			throw new IllegalArgumentException("Cannot connect to chain " + chainNumber + " - no such chain (remember that chains are zero indexed).");
 		}
 
 		// Do we have this bone in the specified chain? If not throw an IllegalArgumentException
-		if(boneNumber >= mChains.get(chainNumber).getNumBones()) {
+		if(boneNumber >= chains.get(chainNumber).getNumBones()) {
 			throw new IllegalArgumentException("Cannot connect to bone " + boneNumber + " of chain " + chainNumber + " - no such bone (remember that bones are zero indexed).");
 		}
 
@@ -202,10 +163,10 @@ public class FabrikStructure2D implements FabrikStructure<FabrikChain2D, Vector2
 		BoneConnectionPoint connectionPoint = chain.getBoneConnectionPoint();
 		Vector2 connectionLocation;
 		if(connectionPoint == BoneConnectionPoint.START) {
-			connectionLocation = mChains.get(chainNumber).getBone(boneNumber).getStartLocation();
+			connectionLocation = chains.get(chainNumber).getBone(boneNumber).getStartLocation();
 		} else {
 			// If it's BoneConnectionPoint.END then we set the connection point to be the end location of the bone we're connecting to
-			connectionLocation = mChains.get(chainNumber).getBone(boneNumber).getEndLocation();
+			connectionLocation = chains.get(chainNumber).getBone(boneNumber).getEndLocation();
 		}
 		relativeChain.setBaseLocation(connectionLocation);
 
@@ -219,11 +180,8 @@ public class FabrikStructure2D implements FabrikStructure<FabrikChain2D, Vector2
 			Vector2 origStart = relativeChain.getBone(loop).getStartLocation();
 			Vector2 origEnd = relativeChain.getBone(loop).getEndLocation();
 
-			Vector2 translatedStart = origStart.cpy().add(connectionLocation);
-			Vector2 translatedEnd = origEnd.cpy().add(connectionLocation);
-
-			relativeChain.getBone(loop).setStartLocation(translatedStart);
-			relativeChain.getBone(loop).setEndLocation(translatedEnd);
+			relativeChain.getBone(loop).getStartLocation().set(origStart).add(connectionLocation);
+			relativeChain.getBone(loop).getEndLocation().set(origEnd).add(connectionLocation);
 		}
 
 		this.addChain(relativeChain);
@@ -252,7 +210,9 @@ public class FabrikStructure2D implements FabrikStructure<FabrikChain2D, Vector2
 	 * @return The number of chains in this structure.
 	 */
 	@Override
-	public int getNumChains() {return this.mChains.size();}
+	public int getNumChains() {
+		return this.chains.size();
+	}
 
 	/**
 	 * Return a chain which exists in this structure.
@@ -263,7 +223,9 @@ public class FabrikStructure2D implements FabrikStructure<FabrikChain2D, Vector2
 	 * @return The desired chain.
 	 */
 	@Override
-	public FabrikChain2D getChain(int chainNumber) {return mChains.get(chainNumber);}
+	public FabrikChain2D getChain(int chainNumber) {
+		return chains.get(chainNumber);
+	}
 
 	/**
 	 * Set the fixed-base mode on the first chain in this structure.
@@ -275,13 +237,8 @@ public class FabrikStructure2D implements FabrikStructure<FabrikChain2D, Vector2
 	 */
 	public void setFixedBaseMode(boolean fixedBaseMode) {
 		// Update our flag and set the fixed base mode on the first (i.e. 0th) chain in this structure.
-		mFixedBaseMode = fixedBaseMode;
-		mChains.get(0).setFixedBaseMode(mFixedBaseMode);
-	}
-
-	@Override
-	public String getName() {
-		return this.mName;
+		this.fixedBaseMode = fixedBaseMode;
+		chains.get(0).setFixedBaseMode(this.fixedBaseMode);
 	}
 
 	/**
@@ -292,10 +249,10 @@ public class FabrikStructure2D implements FabrikStructure<FabrikChain2D, Vector2
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("----- FabrikStructure2D: " + mName + " -----" + "\n");
-		sb.append("Number of chains: " + this.mChains.size() + "\n");
-		for(int loop = 0; loop < this.mChains.size(); ++loop) {
-			sb.append(mChains.get(loop).toString());
+		sb.append("----- FabrikStructure2D -----\n");
+		sb.append("Number of chains: ").append(this.chains.size()).append("\n");
+		for(FabrikChain2D chain : this.chains) {
+			sb.append(chain.toString());
 		}
 
 		return sb.toString();
@@ -305,9 +262,8 @@ public class FabrikStructure2D implements FabrikStructure<FabrikChain2D, Vector2
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((mChains == null) ? 0 : mChains.hashCode());
-		result = prime * result + (mFixedBaseMode ? 1231 : 1237);
-		result = prime * result + ((mName == null) ? 0 : mName.hashCode());
+		result = prime * result + ((chains == null) ? 0 : chains.hashCode());
+		result = prime * result + (fixedBaseMode ? 1231 : 1237);
 		return result;
 	}
 
@@ -323,24 +279,7 @@ public class FabrikStructure2D implements FabrikStructure<FabrikChain2D, Vector2
 			return false;
 		}
 		FabrikStructure2D other = (FabrikStructure2D)obj;
-		if(mChains == null) {
-			if(other.mChains != null) {
-				return false;
-			}
-		} else if(!mChains.equals(other.mChains)) {
-			return false;
-		}
-		if(mFixedBaseMode != other.mFixedBaseMode) {
-			return false;
-		}
-		if(mName == null) {
-			if(other.mName != null) {
-				return false;
-			}
-		} else if(!mName.equals(other.mName)) {
-			return false;
-		}
-		return true;
+		return chains.equals(other.chains) && fixedBaseMode == other.fixedBaseMode;
 	}
 
 } // End of FabrikStructure2D class

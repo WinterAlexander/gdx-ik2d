@@ -1,7 +1,5 @@
 package com.winteralexander.gdx.ik2d;
 
-import java.io.Serializable;
-
 /**
  * Class to represent a joint used to constrain the relative angle between FabrikBone2D objects in an IK chain.
  * <p>
@@ -11,7 +9,7 @@ import java.io.Serializable;
  * <p>
  * Both of these angles are specified in degrees, and are kept within the range 0 degrees to 180 degrees inclusive. The default
  * value of these angles is 180 degrees, which means that the joint does not enforce any rotational
- * constraints. To enforce joint constraints, the {@link #mClockwiseConstraintDegs} and {@link #mAnticlockwiseConstraintDegs}
+ * constraints. To enforce joint constraints, the {@link #clockwiseConstraintDegs} and {@link #anticlockwiseConstraintDegs}
  * properties may be set via the {@link #setClockwiseConstraintDegs} and {@link #setAnticlockwiseConstraintDegs} methods,
  * or alternatively on a FabrikBone2D through identically named methods.
  * <p>
@@ -36,8 +34,7 @@ import java.io.Serializable;
  * @version 0.9 - 19/06/2019
  */
 
-public class FabrikJoint2D implements FabrikJoint<FabrikJoint2D>, Serializable {
-	private static final long serialVersionUID = 1L;
+public class FabrikJoint2D implements FabrikJoint<FabrikJoint2D> {
 
 	/**
 	 * The minimum valid constraint angle for both clockwise and anticlockwise rotation is 0 degrees.
@@ -63,7 +60,7 @@ public class FabrikJoint2D implements FabrikJoint<FabrikJoint2D>, Serializable {
 	 * <p>
 	 * The default is 180.0f.
 	 */
-	private float mClockwiseConstraintDegs = MAX_2D_CONSTRAINT_ANGLE_DEGS;
+	private float clockwiseConstraintDegs = MAX_2D_CONSTRAINT_ANGLE_DEGS;
 
 	/**
 	 * mAntiClockwiseContraintDegs	The angle (specified in degrees) up to which this FabrikJoint2D is allowed to
@@ -75,7 +72,7 @@ public class FabrikJoint2D implements FabrikJoint<FabrikJoint2D>, Serializable {
 	 * <p>
 	 * The default is 180.0f.
 	 */
-	private float mAnticlockwiseConstraintDegs = MAX_2D_CONSTRAINT_ANGLE_DEGS;
+	private float anticlockwiseConstraintDegs = MAX_2D_CONSTRAINT_ANGLE_DEGS;
 
 
 	/**
@@ -84,9 +81,7 @@ public class FabrikJoint2D implements FabrikJoint<FabrikJoint2D>, Serializable {
 	 * Options are LOCAL (default), where constraints are relative to the direction of the previous bone
 	 * in the chain, or GLOBAL - where constraints are in the world-space coordinate system.
 	 */
-	public enum ConstraintCoordinateSystem { LOCAL, GLOBAL }
-
-	;
+	public enum ConstraintCoordinateSystem { LOCAL, GLOBAL };
 
 	/**
 	 * mConstraintCoordinateSystem	The coordinate system within which to interpret constraint directions for t.
@@ -135,8 +130,8 @@ public class FabrikJoint2D implements FabrikJoint<FabrikJoint2D>, Serializable {
 	 */
 	@Override
 	public void set(FabrikJoint2D sourceJoint) {
-		setClockwiseConstraintDegs(sourceJoint.mClockwiseConstraintDegs);
-		setAnticlockwiseConstraintDegs(sourceJoint.mAnticlockwiseConstraintDegs);
+		setClockwiseConstraintDegs(sourceJoint.clockwiseConstraintDegs);
+		setAnticlockwiseConstraintDegs(sourceJoint.anticlockwiseConstraintDegs);
 		this.mConstraintCoordinateSystem = sourceJoint.mConstraintCoordinateSystem;
 	}
 
@@ -150,11 +145,11 @@ public class FabrikJoint2D implements FabrikJoint<FabrikJoint2D>, Serializable {
 	 */
 	public void setClockwiseConstraintDegs(float angleDegs) {
 		if(angleDegs < MIN_2D_CONSTRAINT_ANGLE_DEGS) {
-			mClockwiseConstraintDegs = MIN_2D_CONSTRAINT_ANGLE_DEGS;
+			clockwiseConstraintDegs = MIN_2D_CONSTRAINT_ANGLE_DEGS;
 		} else if(angleDegs > MAX_2D_CONSTRAINT_ANGLE_DEGS) {
-			mClockwiseConstraintDegs = MAX_2D_CONSTRAINT_ANGLE_DEGS;
+			clockwiseConstraintDegs = MAX_2D_CONSTRAINT_ANGLE_DEGS;
 		} else {
-			mClockwiseConstraintDegs = angleDegs;
+			clockwiseConstraintDegs = angleDegs;
 		}
 	}
 
@@ -168,11 +163,11 @@ public class FabrikJoint2D implements FabrikJoint<FabrikJoint2D>, Serializable {
 	 */
 	public void setAnticlockwiseConstraintDegs(float angleDegs) {
 		if(angleDegs < MIN_2D_CONSTRAINT_ANGLE_DEGS) {
-			mAnticlockwiseConstraintDegs = MIN_2D_CONSTRAINT_ANGLE_DEGS;
+			anticlockwiseConstraintDegs = MIN_2D_CONSTRAINT_ANGLE_DEGS;
 		} else if(angleDegs > MAX_2D_CONSTRAINT_ANGLE_DEGS) {
-			mAnticlockwiseConstraintDegs = MAX_2D_CONSTRAINT_ANGLE_DEGS;
+			anticlockwiseConstraintDegs = MAX_2D_CONSTRAINT_ANGLE_DEGS;
 		} else {
-			mAnticlockwiseConstraintDegs = angleDegs;
+			anticlockwiseConstraintDegs = angleDegs;
 		}
 	}
 
@@ -181,14 +176,14 @@ public class FabrikJoint2D implements FabrikJoint<FabrikJoint2D>, Serializable {
 	 *
 	 * @return The clockwise constraint angle of this joint in degrees.
 	 */
-	public float getClockwiseConstraintDegs() {return mClockwiseConstraintDegs;}
+	public float getClockwiseConstraintDegs() {return clockwiseConstraintDegs;}
 
 	/**
 	 * Get the anticlockwise constraint angle of this joint in degrees.
 	 *
 	 * @return The anticlockwise constraint angle of this joint in degrees.
 	 */
-	public float getAnticlockwiseConstraintDegs() {return mAnticlockwiseConstraintDegs;}
+	public float getAnticlockwiseConstraintDegs() {return anticlockwiseConstraintDegs;}
 
 	/**
 	 * Return the coordinate system to use for any constraints applied to the joint of this bone.
@@ -212,8 +207,8 @@ public class FabrikJoint2D implements FabrikJoint<FabrikJoint2D>, Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + Float.floatToIntBits(mAnticlockwiseConstraintDegs);
-		result = prime * result + Float.floatToIntBits(mClockwiseConstraintDegs);
+		result = prime * result + Float.floatToIntBits(anticlockwiseConstraintDegs);
+		result = prime * result + Float.floatToIntBits(clockwiseConstraintDegs);
 		return result;
 	}
 
@@ -229,13 +224,13 @@ public class FabrikJoint2D implements FabrikJoint<FabrikJoint2D>, Serializable {
 			return false;
 		}
 		FabrikJoint2D other = (FabrikJoint2D)obj;
-		if(Float.floatToIntBits(mAnticlockwiseConstraintDegs) !=
-				Float.floatToIntBits(other.mAnticlockwiseConstraintDegs)) {
+		if(Float.floatToIntBits(anticlockwiseConstraintDegs) !=
+				Float.floatToIntBits(other.anticlockwiseConstraintDegs)) {
 			return false;
 		}
 
-		return Float.floatToIntBits(mClockwiseConstraintDegs)
-				== Float.floatToIntBits(other.mClockwiseConstraintDegs);
+		return Float.floatToIntBits(clockwiseConstraintDegs)
+				== Float.floatToIntBits(other.clockwiseConstraintDegs);
 	}
 
 } // End of FabrikJoint2D class

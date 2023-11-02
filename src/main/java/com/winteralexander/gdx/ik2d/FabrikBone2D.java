@@ -1,5 +1,6 @@
 package com.winteralexander.gdx.ik2d;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 /**
@@ -32,33 +33,23 @@ public class FabrikBone2D implements FabrikBone<Vector2, FabrikJoint2D> {
 	 * be constrained). In this way the single joint which can be considered to be at the
 	 * start location of each bone controls the allowable range of motion for that bone alone.
 	 */
-	private FabrikJoint2D mJoint = new FabrikJoint2D();
+	private final FabrikJoint2D joint = new FabrikJoint2D();
 
 	/**
-	 * mStartLocation	The start location of this FabrikBone2D object.
+	 * startLoc	The start location of this FabrikBone2D object.
 	 * <p>
 	 * The start location of a bone may only be set through a constructor or via an 'addBone'
 	 * or 'addConsecutiveBone' method provided by the {@link FabrikChain2D} class.
 	 */
-	private Vector2 mStartLocation = new Vector2();
+	private final Vector2 startLoc = new Vector2();
 
 	/**
-	 * mEndLocation	The end location of this FabrikBone2D object.
+	 * endLoc	The end location of this FabrikBone2D object.
 	 * <p>
 	 * The end location of a bone may only be set through a constructor or indirectly via an
 	 * 'addBone' method provided by the {@link FabrikChain2D} class.
 	 */
-	private Vector2 mEndLocation = new Vector2();
-
-	/**
-	 * mName	The name of this FabrikBone2D object.
-	 * <p>
-	 * It is not necessary to use this property, but it is provided to allow for easy identification
-	 * of a bone, such as when used in a map or such.
-	 * <p>
-	 * Names exceeding 100 characters will be truncated.
-	 */
-	private String mName;
+	private final Vector2 endLoc = new Vector2();
 
 	/**
 	 * mLength	The length of this bone from its start location to its end location.
@@ -66,61 +57,60 @@ public class FabrikBone2D implements FabrikBone<Vector2, FabrikJoint2D> {
 	 * In the typical usage scenario of a FabrikBone2D the length of the bone remains constant.
 	 * <p>
 	 * The length may be set explicitly through a value provided to a constructor, or implicitly
-	 * when it is calculated as the distance between the {@link #mStartLocation} and {@link #mEndLocation}
+	 * when it is calculated as the distance between the {@link #startLoc} and {@link #endLoc}
 	 * of a bone.
 	 * <p>
 	 * Attempting to set a bone length of less than zero, either explicitly or implicitly, will result
 	 * in an IllegalArgumentException or
 	 */
-	private float mLength;
+	private float length;
 
 	/**
 	 * mGlobalConstraintUV	The world-space constraint unit-vector of this 2D bone.
 	 */
-	private Vector2 mGlobalConstraintUV = new Vector2(1.0f, 0.0f);
+	private final Vector2 mGlobalConstraintUV = new Vector2(1.0f, 0.0f);
+
+	private final Vector2 tmpVec2UV = new Vector2();
 
 
-	// ---------- Constructors ----------
-
-	/**
-	 * Default constructor
-	 */
 	FabrikBone2D() {}
 
 	/**
 	 * Constructor to create a new FabrikBone2D from a start and end location as provided by a pair of Vec2fs.
 	 * <p>
-	 * The {@link #mLength} property is calculated and set from the provided locations. All other properties
+	 * The {@link #length} property is calculated and set from the provided locations. All other properties
 	 * are set to their default values.
 	 * <p>
 	 * Instantiating a FabrikBone2D with the exact same start and end location, and hence a length of zero,
 	 * may result in undefined behaviour.
 	 *
-	 * @param    startLocation    The start location of the bone in world space.
-	 * @param    endLocation        The end location of the bone in world space.
+	 * @param startLocation The start location of the bone in world space.
+	 * @param endLocation   The end location of the bone in world space.
 	 */
 	public FabrikBone2D(Vector2 startLocation, Vector2 endLocation) {
-		mStartLocation.set(startLocation);
-		mEndLocation.set(endLocation);
+		startLoc.set(startLocation);
+		endLoc.set(endLocation);
 		setLength(startLocation.dst(endLocation));
 	}
 
 	/**
 	 * Constructor to create a new FabrikBone2D from a start and end location as provided by a four floats.
 	 * <p>
-	 * The {@link #mLength} property is calculated and set from the provided locations. All other properties
+	 * The {@link #length} property is calculated and set from the provided locations. All other properties
 	 * are set to their default values.
 	 * <p>
 	 * Instantiating a FabrikBone2D with the exact same start and end location, and hence a length of zero,
 	 * may result in undefined behaviour.
 	 *
-	 * @param    startX    The horizontal start location of the bone in world space.
-	 * @param    startY    The vertical   start location of the bone in world space.
-	 * @param    endX    The horizontal end   location of the bone in world space.
-	 * @param    endY    The vertical   end   location of the bone in world space.
+	 * @param startX The horizontal start location of the bone in world space.
+	 * @param startY The vertical   start location of the bone in world space.
+	 * @param endX   The horizontal end   location of the bone in world space.
+	 * @param endY   The vertical   end   location of the bone in world space.
 	 */
 	public FabrikBone2D(float startX, float startY, float endX, float endY) {
-		this(new Vector2(startX, startY), new Vector2(endX, endY));
+		startLoc.set(startX, startY);
+		endLoc.set(endX, endY);
+		setLength(startLoc.dst(endLoc));
 	}
 
 	/**
@@ -133,21 +123,19 @@ public class FabrikBone2D implements FabrikBone<Vector2, FabrikJoint2D> {
 	 * <p>
 	 * Instantiating a FabrikBone3D with a length of precisely zero may result in undefined behaviour.
 	 *
-	 * @param    startLocation    The start location of the bone in world-space.
-	 * @param    directionUV        The direction unit vector of the bone in world-space.
-	 * @param    length            The length of the bone in world-space units.
+	 * @param startLocation The start location of the bone in world-space.
+	 * @param directionUV   The direction unit vector of the bone in world-space.
+	 * @param length        The length of the bone in world-space units.
 	 */
 	public FabrikBone2D(Vector2 startLocation, Vector2 directionUV, float length) {
 		// Sanity checking
 		// Ensure that the magnitude of this direction unit vector is greater than zero
-		if ( directionUV.len2() <= 0.0f )
-		{
+		if(directionUV.len2() <= 0.0f)
 			throw new IllegalArgumentException("Vec2f direction unit vector cannot be zero.");
-		}
 
 		// Set the start and end locations
-		mStartLocation.set(startLocation);
-		mEndLocation.set(mStartLocation).mulAdd(directionUV.nor(), length);
+		startLoc.set(startLocation);
+		endLoc.set(startLoc).mulAdd(directionUV.nor(), length);
 
 		// Set the bone length via the setLength method rather than directly on the mLength property so that validation is performed
 		setLength(length);
@@ -170,18 +158,24 @@ public class FabrikBone2D implements FabrikBone<Vector2, FabrikJoint2D> {
 	 * <p>
 	 * Instantiating a FabrikBone3D with a length of precisely zero may result in undefined behaviour.
 	 *
-	 * @param    startLocation        The start location of the bone in world-space.
-	 * @param    directionUV            The direction unit vector of the bone in world-space.
-	 * @param    length                The length of the bone in world-space units.
-	 * @param    cwConstraintDegs    The clockwise constraint angle in degrees.
-	 * @param    acwConstraintDegs    The anticlockwise constraint angle in degrees.
+	 * @param startLocation     The start location of the bone in world-space.
+	 * @param directionUV       The direction unit vector of the bone in world-space.
+	 * @param length            The length of the bone in world-space units.
+	 * @param cwConstraintDegs  The clockwise constraint angle in degrees.
+	 * @param acwConstraintDegs The anticlockwise constraint angle in degrees.
 	 * @see FabrikChain2D.BaseboneConstraintType2D
 	 */
-	public FabrikBone2D(Vector2 startLocation, Vector2 directionUV, float length, float cwConstraintDegs, float acwConstraintDegs) {
-		// Set up as per previous constructor - IllegalArgumentExceptions will be thrown for invalid directions or lengths
+	public FabrikBone2D(Vector2 startLocation,
+	                    Vector2 directionUV,
+	                    float length,
+	                    float cwConstraintDegs,
+	                    float acwConstraintDegs) {
+		// Set up as per previous constructor - IllegalArgumentExceptions will be thrown for invalid
+		// directions or lengths
 		this(startLocation, directionUV, length);
 
-		// Set the constraint angles - IllegalArgumentExceptions will be thrown for invalid constraint angles
+		// Set the constraint angles - IllegalArgumentExceptions will be thrown for invalid
+		// constraint angles
 		setClockwiseConstraintDegs(cwConstraintDegs);
 		setAnticlockwiseConstraintDegs(acwConstraintDegs);
 	}
@@ -189,86 +183,72 @@ public class FabrikBone2D implements FabrikBone<Vector2, FabrikJoint2D> {
 	/**
 	 * Copy constructor.
 	 * <p>
-	 * Takes a source FabrikBone2D object and copies all properties into the new FabrikBone2D by value.
-	 * Once this is done, there are no shared references between the source and the new object, and they are
-	 * exact copies of each other.
+	 * Takes a source FabrikBone2D object and copies all properties into the new FabrikBone2D by
+	 * value. Once this is done, there are no shared references between the source and the new
+	 * object, and they are exact copies of each other.
 	 *
-	 * @param    source    The FabrikBone2D to clone.
+	 * @param source The FabrikBone2D to clone.
 	 */
 	public FabrikBone2D(FabrikBone2D source) {
-		// Set all custom classes via their set methods to avoid new memory allocations
-		mStartLocation.set(source.mStartLocation);
-		mEndLocation.set(source.mEndLocation);
-		mJoint.set(source.mJoint);
-
-		// Set the remaining properties by value via assignment
-		mName = source.mName;
-		mLength = source.mLength;
-		mGlobalConstraintUV = source.mGlobalConstraintUV;
+		startLoc.set(source.startLoc);
+		endLoc.set(source.endLoc);
+		joint.set(source.joint);
+		length = source.length;
+		mGlobalConstraintUV.set(source.mGlobalConstraintUV);
 	}
 
-	// ---------- Methods ----------
-
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public float length() {return mLength;}
+	public float length() {
+		return length;
+	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public Vector2 getStartLocation() {return mStartLocation;}
+	public Vector2 getStartLocation() {
+		return startLoc;
+	}
 
-	/**
-	 * Get the start location of this bone in world-space as an array of two floats.
-	 *
-	 * @return The start location of this bone.
-	 */
-	public float[] getStartLocationAsArray() {return new float[] { mStartLocation.x, mStartLocation.y };}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public Vector2 getEndLocation() {return mEndLocation;}
-
-	/**
-	 * Get the end location of the bone in world-space as an array of two floats.
-	 *
-	 * @return The end location of this bone.
-	 */
-	public float[] getEndLocationAsArray() {return new float[] { mEndLocation.x, mEndLocation.y };}
+	public Vector2 getEndLocation() {
+		return endLoc;
+	}
 
 	/**
 	 * Set the FabrikJoint2D object of this bone.
 	 *
 	 * @param joint The FabrikJoint2D which this bone should use.
 	 */
-	public void setJoint(FabrikJoint2D joint) {mJoint.set(joint);}
+	public void setJoint(FabrikJoint2D joint) {
+		this.joint.set(joint);
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public FabrikJoint2D getJoint() {return mJoint;}
+	public FabrikJoint2D getJoint() {
+		return joint;
+	}
 
 	/**
 	 * Set the clockwise constraint angle of this bone's joint in degrees.
 	 * <p>
-	 * The valid range of constraint angle is 0.0f degrees to 180.0f degrees inclusive, angles outside this range are clamped.
+	 * The valid range of constraint angle is 0.0f degrees to 180.0f degrees inclusive, angles
+	 * outside this range are clamped.
 	 *
 	 * @param angleDegs The clockwise constraint angle specified in degrees.
 	 */
-	public void setClockwiseConstraintDegs(float angleDegs) {mJoint.setClockwiseConstraintDegs(angleDegs);}
+	public void setClockwiseConstraintDegs(float angleDegs) {
+		joint.setClockwiseConstraintDegs(angleDegs);
+	}
 
 	/**
 	 * Get the clockwise constraint angle of this bone's joint in degrees.
 	 *
 	 * @return the clockwise constraint angle in degrees.
 	 */
-	public float getClockwiseConstraintDegs() {return mJoint.getClockwiseConstraintDegs();}
+	public float getClockwiseConstraintDegs() {
+		return joint.getClockwiseConstraintDegs();
+	}
 
 	/**
 	 * Set the anticlockwise constraint angle of this bone's joint in degrees.
@@ -279,14 +259,18 @@ public class FabrikBone2D implements FabrikBone<Vector2, FabrikJoint2D> {
 	 *
 	 * @param angleDegs The anticlockwise constraint angle specified in degrees.
 	 */
-	public void setAnticlockwiseConstraintDegs(float angleDegs) {mJoint.setAnticlockwiseConstraintDegs(angleDegs);}
+	public void setAnticlockwiseConstraintDegs(float angleDegs) {
+		joint.setAnticlockwiseConstraintDegs(angleDegs);
+	}
 
 	/**
 	 * Get the anticlockwise constraint angle of this bone's joint in degrees.
 	 *
 	 * @return the anticlockwise constraint angle in degrees.
 	 */
-	public float getAnticlockwiseConstraintDegs() {return mJoint.getAnticlockwiseConstraintDegs();}
+	public float getAnticlockwiseConstraintDegs() {
+		return joint.getAnticlockwiseConstraintDegs();
+	}
 
 	/**
 	 * Get the direction unit vector between the start location and end location of this bone.
@@ -296,7 +280,13 @@ public class FabrikBone2D implements FabrikBone<Vector2, FabrikJoint2D> {
 	 * @return The direction unit vector of this bone.
 	 */
 	public Vector2 getDirectionUV() {
-		return mEndLocation.cpy().sub(mStartLocation).nor();
+		if(Math.abs(tmpVec2UV.len2() - 1.0f) < MathUtils.FLOAT_ROUNDING_ERROR
+				&& tmpVec2UV.dot(endLoc.y - startLoc.y, startLoc.x - endLoc.x) == 0.0f
+				&& tmpVec2UV.dot(endLoc.x - startLoc.x, endLoc.y - startLoc.y) > 0.0f)
+			return tmpVec2UV;
+
+		tmpVec2UV.set(endLoc).sub(startLoc).nor();
+		return tmpVec2UV;
 	}
 
 	/**
@@ -311,27 +301,11 @@ public class FabrikBone2D implements FabrikBone<Vector2, FabrikJoint2D> {
 	/**
 	 * Set the world-space constraint unit-vector of this bone.
 	 *
-	 * @param    v    The world-space constraint unit vector.
+	 * @param v The world-space constraint unit vector.
 	 */
 	public void setGlobalConstraintUV(Vector2 v) {
-		this.mGlobalConstraintUV = v;
+		this.mGlobalConstraintUV.set(v);
 	}
-
-	/**
-	 * Set the name of this bone, capped to 100 characters if required.
-	 *
-	 * @param    name    The name to set.
-	 */
-	public void setName(String name) {
-		mName = name;}
-
-	/**
-	 * Return the name of this bone.
-	 *
-	 * @return The name of this bone.
-	 */
-	public String getName() {return mName;}
-
 
 	/**
 	 * Return the coordinate system to use for any constraints applied to the joint of this bone.
@@ -339,16 +313,16 @@ public class FabrikBone2D implements FabrikBone<Vector2, FabrikJoint2D> {
 	 * @return The coordinate system to use for any constraints applied to the joint of this bone.
 	 */
 	public FabrikJoint2D.ConstraintCoordinateSystem getJointConstraintCoordinateSystem() {
-		return this.mJoint.getConstraintCoordinateSystem();
+		return this.joint.getConstraintCoordinateSystem();
 	}
 
 	/**
 	 * Set the coordinate system to use for any constraints applied to the joint of this bone.
 	 *
-	 * @param    coordSystem        The coordinate system to use for any constraints applied to the joint of this bone.
+	 * @param coordSystem The coordinate system to use for any constraints applied to the joint of this bone.
 	 */
 	public void setJointConstraintCoordinateSystem(FabrikJoint2D.ConstraintCoordinateSystem coordSystem) {
-		this.mJoint.setConstraintCoordinateSystem(coordSystem);
+		this.joint.setConstraintCoordinateSystem(coordSystem);
 	}
 
 	/**
@@ -361,26 +335,24 @@ public class FabrikBone2D implements FabrikBone<Vector2, FabrikJoint2D> {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 
-		sb.append("Start joint location : " + mStartLocation + "\n");
-		sb.append("End   joint location : " + mEndLocation + "\n");
-		sb.append("Bone direction       : " + mEndLocation.cpy().sub(mStartLocation).nor() + "\n");
-		sb.append("Bone length          : " + mLength + "\n");
-		sb.append(mJoint.toString());
+		sb.append("Start joint location : ").append(startLoc).append("\n");
+		sb.append("End   joint location : ").append(endLoc).append("\n");
+		sb.append("Bone direction       : ").append(getDirectionUV()).append("\n");
+		sb.append("Bone length          : ").append(length).append("\n");
+		sb.append(joint.toString());
 
 		return sb.toString();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public void setStartLocation(Vector2 location) {mStartLocation.set(location);}
+	public void setStartLocation(Vector2 location) {
+		startLoc.set(location);
+	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public void setEndLocation(Vector2 location) {mEndLocation.set(location);}
+	public void setEndLocation(Vector2 location) {
+		endLoc.set(location);
+	}
 
 	/**
 	 * Set the length of the bone.
@@ -388,11 +360,11 @@ public class FabrikBone2D implements FabrikBone<Vector2, FabrikJoint2D> {
 	 * If the length argument is not greater then zero an IllegalArgumentException is thrown.
 	 * If the length argument is precisely zero then
 	 *
-	 * @param    length    The value to set on the {@link #mLength} property.
+	 * @param length The value to set on the {@link #length} property.
 	 */
 	private void setLength(float length) {
 		if(length >= 0.0f) {
-			mLength = length;
+			this.length = length;
 		} else {
 			throw new IllegalArgumentException("Bone length must be a positive value.");
 		}
@@ -402,11 +374,10 @@ public class FabrikBone2D implements FabrikBone<Vector2, FabrikJoint2D> {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((mEndLocation == null) ? 0 : mEndLocation.hashCode());
-		result = prime * result + ((mJoint == null) ? 0 : mJoint.hashCode());
-		result = prime * result + Float.floatToIntBits(mLength);
-		result = prime * result + ((mName == null) ? 0 : mName.hashCode());
-		result = prime * result + ((mStartLocation == null) ? 0 : mStartLocation.hashCode());
+		result = prime * result + endLoc.hashCode();
+		result = prime * result + joint.hashCode();
+		result = prime * result + Float.floatToIntBits(length);
+		result = prime * result + startLoc.hashCode();
 		return result;
 	}
 
@@ -422,35 +393,16 @@ public class FabrikBone2D implements FabrikBone<Vector2, FabrikJoint2D> {
 			return false;
 		}
 		FabrikBone2D other = (FabrikBone2D)obj;
-		if(mEndLocation == null) {
-			if(other.mEndLocation != null) {
-				return false;
-			}
-		} else if(!mEndLocation.equals(other.mEndLocation)) {
+		if(!endLoc.equals(other.endLoc)) {
 			return false;
 		}
-		if(mJoint == null) {
-			if(other.mJoint != null) {
-				return false;
-			}
-		} else if(!mJoint.equals(other.mJoint)) {
+		if(!joint.equals(other.joint)) {
 			return false;
 		}
-		if(Float.floatToIntBits(mLength) != Float.floatToIntBits(other.mLength)) {
+		if(Float.floatToIntBits(length) != Float.floatToIntBits(other.length)) {
 			return false;
 		}
-		if(mName == null) {
-			if(other.mName != null) {
-				return false;
-			}
-		} else if(!mName.equals(other.mName)) {
-			return false;
-		}
-		if(mStartLocation == null) {
-			if(other.mStartLocation != null) {
-				return false;
-			}
-		} else if(!mStartLocation.equals(other.mStartLocation)) {
+		if(!startLoc.equals(other.startLoc)) {
 			return false;
 		}
 		return true;

@@ -204,13 +204,6 @@ public interface FabrikChain<
 	float getSolveDistanceThreshold();
 
 	/**
-	 * Return the name of this FabrikChain.
-	 *
-	 * @return The name of his chain, or <strong>null</strong> if the name has not been set.
-	 */
-	String getName();
-
-	/**
 	 * Return the number of bones in the IK chain.
 	 * <p>
 	 * Bones may be added to the chain via the addBone or addConsecutiveBone methods.
@@ -299,13 +292,6 @@ public interface FabrikChain<
 	 * @param solveDistance The distance between the end effector of this IK chain and target within which we will accept the solution.
 	 */
 	void setSolveDistanceThreshold(float solveDistance);
-
-	/**
-	 * Set the name of this chain, capped to 100 characters if required.
-	 *
-	 * @param    name    The name to set.
-	 */
-	void setName(String name);
 
 	/**
 	 * Solve this IK chain for the current embedded target location.

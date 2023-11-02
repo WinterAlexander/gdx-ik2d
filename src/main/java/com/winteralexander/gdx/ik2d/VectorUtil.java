@@ -12,20 +12,26 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class VectorUtil {
 
-	public static float getSignedAngleDegsTo(Vector2 first, Vector2 otherVector)
+	public static float getSignedAngleDegsTo(Vector2 first, Vector2 second)
 	{
 		// Normalise the vectors that we're going to use
-		Vector2 thisVectorUV  = first.cpy().nor();
-		Vector2 otherVectorUV = otherVector.cpy().nor();
+		if(Math.abs(first.len2() - 1.0) > MathUtils.FLOAT_ROUNDING_ERROR)
+			throw new IllegalArgumentException("first argument to getSignedAngleDegsTo is not unit length");
+		if(Math.abs(second.len2() - 1.0) > MathUtils.FLOAT_ROUNDING_ERROR)
+			throw new IllegalArgumentException("second argument to getSignedAngleDegsTo is not unit length");
 
 		// Calculate the unsigned angle between the vectors as the arc-cosine of their dot product
-		float unsignedAngleDegs = (float)Math.acos( thisVectorUV.dot(otherVectorUV) ) * MathUtils.radiansToDegrees;
+		float unsignedAngleDegs = (float)Math.acos( first.dot(second) ) * MathUtils.radiansToDegrees;
 
 		// Calculate and return the signed angle between the two vectors using the zcross method
-		return unsignedAngleDegs * Math.signum(thisVectorUV.x * otherVectorUV.y - otherVectorUV.x * thisVectorUV.y);
+		return unsignedAngleDegs * Math.signum(first.x * second.y - second.x * first.y);
 	}
 
-	public static Vector2 getConstrainedUV(Vector2 directionUV, Vector2 baselineUV, float clockwiseConstraintDegs, float antiClockwiseConstraintDegs)
+	public static void getConstrainedUV(Vector2 directionUV,
+	                                    Vector2 baselineUV,
+	                                    float clockwiseConstraintDegs,
+	                                    float antiClockwiseConstraintDegs,
+	                                    Vector2 out)
 	{
 		// Get the signed angle from the baseline UV to the direction UV.
 		// Note: In our signed angle ranges:
@@ -38,7 +44,7 @@ public class VectorUtil {
 		{
 			// ...then our constrained unit vector is the baseline rotated by the anti-clockwise constraint angle.
 			// Note: We could do this by calculating a correction angle to apply to the directionUV, but it's simpler to work from the baseline.
-			return baselineUV.cpy().rotateDeg(antiClockwiseConstraintDegs);
+			out.set(baselineUV).rotateDeg(antiClockwiseConstraintDegs);
 		}
 
 		// If we've exceeded the clockwise (negative) constraint angle...
@@ -46,10 +52,10 @@ public class VectorUtil {
 		{
 			// ...then our constrained unit vector is the baseline rotated by the clockwise constraint angle.
 			// Note: Again, we could do this by calculating a correction angle to apply to the directionUV, but it's simpler to work from the baseline.
-			return baselineUV.cpy().rotateDeg(-clockwiseConstraintDegs);
+			out.set(baselineUV).rotateDeg(-clockwiseConstraintDegs);
 		}
 
 		// If we have not exceeded any constraint then we simply return the original direction unit vector
-		return directionUV;
+		out.set(directionUV);
 	}
 }
