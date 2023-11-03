@@ -901,7 +901,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 			// Get the length of the bone we're working on
 			float boneLength = chain.get(loop).length();
 
-			FabrikBone2D thisBone = chain.get(loop);
+			FabrikBone2D bone = chain.get(loop);
 
 			// If we are not working on the base bone
 			if(loop != 0) {
@@ -909,18 +909,18 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 
 				// Constrain the angle between this bone and the inner bone.
 				// Note: On the backward pass we constrain to the limits imposed by the first joint of this bone.
-				float clockwiseConstraintDegs = thisBone.getJoint().getClockwiseConstraintDegs();
-				float antiClockwiseConstraintDegs = thisBone.getJoint().getAnticlockwiseConstraintDegs();
+				float clockwiseConstraintDegs = bone.getJoint().getClockwiseConstraintDegs();
+				float antiClockwiseConstraintDegs = bone.getJoint().getAnticlockwiseConstraintDegs();
 
-				if(thisBone.getJointConstraintCoordinateSystem() == FabrikJoint2D.ConstraintCoordinateSystem.LOCAL) {
-					VectorUtil.getConstrainedUV(thisBone.getDirectionUV(),
+				if(bone.getJointConstraintCoordinateSystem() == FabrikJoint2D.ConstraintCoordinateSystem.LOCAL) {
+					VectorUtil.getConstrainedUV(bone.getDirectionUV(),
 							previousBone.getDirectionUV(),
 							clockwiseConstraintDegs,
 							antiClockwiseConstraintDegs,
 							tmpConstrainedUV);
 				} else { // Bone is constrained in global coordinate system
-					VectorUtil.getConstrainedUV(thisBone.getDirectionUV(),
-							thisBone.getGlobalConstraintUV(),
+					VectorUtil.getConstrainedUV(bone.getDirectionUV(),
+							bone.getGlobalConstraintUV(),
 							clockwiseConstraintDegs,
 							antiClockwiseConstraintDegs,
 							tmpConstrainedUV);
@@ -929,25 +929,25 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 				// At this stage we have an inner-to-outer unit vector for this bone which is within our constraints,
 				// so we can set the new end location to be the start location of this bone plus the constrained
 				// inner-to-outer direction unit vector multiplied by the length of this bone.
-				thisBone.getEndLocation().set(thisBone.getStartLocation()).mulAdd(tmpConstrainedUV, boneLength);
+				bone.getEndLocation().set(bone.getStartLocation()).mulAdd(tmpConstrainedUV, boneLength);
 
 				// If we are not working on the end bone, then we set the start joint location of
 				// the next bone in the chain (i.e. the bone closer to the end effector) to be the
 				// new end joint location of this bone also.
 				if(loop < this.chain.size - 1) {
-					chain.get(loop + 1).setStartLocation(thisBone.getEndLocation());
+					chain.get(loop + 1).setStartLocation(bone.getEndLocation());
 				}
 			} else { // If we ARE working on the base bone...
 				// If the base location is fixed then snap the start location of the base bone back to the fixed base
 				if(fixedBaseMode) {
-					chain.get(0).setStartLocation(baseLocation);
+					bone.setStartLocation(baseLocation);
 				} else { // If the base location is not fixed...
 					// ...then set the new base bone start location to be its the end location minus the
 					// bone direction multiplied by the length of the bone (i.e. projected backwards).
 					//float boneZeroLength = mChain.get(0).length();
-					Vector2 boneZeroUV = chain.get(0).getDirectionUV();
-					Vector2 boneZeroEndLocation = chain.get(0).getEndLocation();
-					chain.get(0).getStartLocation().set(boneZeroEndLocation).mulAdd(boneZeroUV, -boneLength);
+					Vector2 boneZeroUV = bone.getDirectionUV();
+					Vector2 boneZeroEndLocation = bone.getEndLocation();
+					bone.getStartLocation().set(boneZeroEndLocation).mulAdd(boneZeroUV, -boneLength);
 				}
 
 				// If the base bone is unconstrained then process it as usual...
@@ -955,11 +955,12 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 
 					// Calculate the new end location as the start location plus the direction times the length of the bone
 					// Set the new end joint location
-					chain.get(0).getEndLocation().set(thisBone.getStartLocation()).mulAdd(thisBone.getDirectionUV(), boneLength);
+					Vector2 boneUV = bone.getDirectionUV();
+					bone.getEndLocation().set(bone.getStartLocation()).mulAdd(boneUV, boneLength);
 
 					// Also, set the start location of the next bone to be the end location of this bone
 					if(chain.size > 1) {
-						chain.get(1).setStartLocation(chain.get(0).getEndLocation());
+						chain.get(1).setStartLocation(bone.getEndLocation());
 					}
 				} else {
 					// ...otherwise we must constrain it to the basebone constraint unit vector
@@ -971,12 +972,12 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 
 					// Get the constrained direction unit vector between the base bone and the base bone constraint unit vector
 					// Note: On the backward pass we constrain to the limits imposed by the first joint of this bone.
-					float clockwiseConstraintDegs = thisBone.getJoint().getClockwiseConstraintDegs();
-					float antiClockwiseConstraintDegs = thisBone.getJoint().getAnticlockwiseConstraintDegs();
+					float clockwiseConstraintDegs = bone.getJoint().getClockwiseConstraintDegs();
+					float antiClockwiseConstraintDegs = bone.getJoint().getAnticlockwiseConstraintDegs();
 
 					// LOCAL_ABSOLUTE? (i.e. local-space directional constraint) - then we must constraint about the relative basebone constraint UV...
 					if(baseboneConstraintType == BaseboneConstraintType2D.LOCAL_ABSOLUTE) {
-						VectorUtil.getConstrainedUV(thisBone.getDirectionUV(),
+						VectorUtil.getConstrainedUV(bone.getDirectionUV(),
 								baseboneRelativeConstraintUV,
 								clockwiseConstraintDegs,
 								antiClockwiseConstraintDegs,
@@ -984,7 +985,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 
 					} else {
 						// ...otherwise we're free to use the standard basebone constraint UV.
-						VectorUtil.getConstrainedUV(thisBone.getDirectionUV(),
+						VectorUtil.getConstrainedUV(bone.getDirectionUV(),
 								baseboneConstraintUV,
 								clockwiseConstraintDegs,
 								antiClockwiseConstraintDegs,
@@ -995,13 +996,13 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 					// so we can set the new end location to be the start location of this bone plus the constrained
 					// inner-to-outer direction unit vector multiplied by the length of the bone.
 					// Set the new end joint location for this bone
-					chain.get(loop).getEndLocation().set(chain.get(loop).getStartLocation()).mulAdd(tmpConstrainedUV, boneLength);
+					bone.getEndLocation().set(bone.getStartLocation()).mulAdd(tmpConstrainedUV, boneLength);
 
 					// If we are not working on the end bone, then we set the start joint location of
 					// the next bone in the chain (i.e. the bone closer to the end effector) to be the
 					// new end joint location of this bone.
-					if(loop < this.chain.size - 1) {
-						chain.get(loop + 1).setStartLocation(chain.get(loop).getEndLocation());
+					if(chain.size > 1) {
+						chain.get(1).setStartLocation(chain.get(loop).getEndLocation());
 					}
 
 				} // End of basebone constraint enforcement section			
@@ -1015,7 +1016,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 
 		// Finally, get the current effector location and calculate the distance between the
 		// current effector location and the target.
-		return chain.get(this.chain.size - 1).getEndLocation().dst(targetX, targetY);
+		return chain.get(chain.size - 1).getEndLocation().dst(targetX, targetY);
 	}
 
 	/**
