@@ -28,9 +28,10 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * <p>
 	 * See {@link #setBaseboneConstraintType(BaseboneConstraintType2D)}
 	 */
-	public enum BaseboneConstraintType2D implements BaseboneConstraintType {NONE, GLOBAL_ABSOLUTE, LOCAL_RELATIVE, LOCAL_ABSOLUTE}
+	public enum BaseboneConstraintType2D implements BaseboneConstraintType {
+		NONE, GLOBAL_ABSOLUTE, LOCAL_RELATIVE, LOCAL_ABSOLUTE
+	}
 
-	// ---------- Private Properties ----------
 
 	/**
 	 * The core of a FabrikChain2D is a list of FabrikBone2D objects, where each bone contains a start and end location, and a joint
@@ -122,7 +123,6 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * See {@link #setFixedBaseMode(boolean)}
 	 */
 	private final Vector2 baseLocation = new Vector2();
-
 
 	/**
 	 * mFixedBaseMode	Whether this FabrikChain2D has a fixed (i.e. immovable) base location.
@@ -233,6 +233,14 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 */
 	private int connectedBoneNumber = -1;
 
+	private final Vector2 tmpDir = new Vector2();
+	private final Vector2 tmpOuterDir = new Vector2();
+	private final Vector2 tmpInnerDir = new Vector2();
+	private final Vector2 tmpConstrainedUV = new Vector2();
+
+	private final Array<FabrikBone2D> tmpStartSolution = new Array<>();
+	private final Array<FabrikBone2D> tmpBestSolution = new Array<>();
+
 	public FabrikChain2D() {}
 
 	/**
@@ -242,7 +250,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 */
 	public FabrikChain2D(FabrikChain2D source) {
 		// Force copy by value
-		chain.addAll(source.cloneChainVector());
+		source.cloneChainVector(chain);
 		baseLocation.set(source.baseLocation);
 		lastTargetLocation.set(source.lastTargetLocation);
 		lastBaseLocation.set(source.lastBaseLocation);
@@ -405,7 +413,9 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * @return The basebone constraint type of this chain.
 	 */
 	@Override
-	public BaseboneConstraintType2D getBaseboneConstraintType() { return baseboneConstraintType; }
+	public BaseboneConstraintType2D getBaseboneConstraintType() {
+		return baseboneConstraintType;
+	}
 
 	/**
 	 * Return the basebone constraint unit vector.
@@ -413,7 +423,9 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * @return The basebone constraint unit vector of this FabrikChain2D.
 	 */
 	@Override
-	public Vector2 getBaseboneConstraintUV() {return baseboneConstraintUV;}
+	public Vector2 getBaseboneConstraintUV() {
+		return baseboneConstraintUV;
+	}
 
 	/**
 	 * Return
@@ -595,7 +607,9 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 *
 	 * @param type The BaseboneConstraintType2D to set.
 	 */
-	public void setBaseboneConstraintType(BaseboneConstraintType2D type) {baseboneConstraintType = type;}
+	public void setBaseboneConstraintType(BaseboneConstraintType2D type) {
+		baseboneConstraintType = type;
+	}
 
 	/**
 	 * Set the constraint unit vector for the basebone of this chain..
@@ -638,7 +652,9 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 *
 	 * @param boneConnectionPoint The BoneConnectionPoint to set on this chain.
 	 */
-	public void setBoneConnectionPoint(BoneConnectionPoint boneConnectionPoint) {this.boneConnectionPoint = boneConnectionPoint;}
+	public void setBoneConnectionPoint(BoneConnectionPoint boneConnectionPoint) {
+		this.boneConnectionPoint = boneConnectionPoint;
+	}
 
 	/**
 	 * Set the List%lt;FabrikBone2D%gt; of this FabrikChain2D to the provided list by reference.
@@ -761,11 +777,6 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 		// All good? Set the new solve distance threshold
 		solveDistanceThreshold = solveDistance;
 	}
-
-	private final Vector2 tmpDir = new Vector2();
-	private final Vector2 tmpOuterDir = new Vector2();
-	private final Vector2 tmpInnerDir = new Vector2();
-	private final Vector2 tmpConstrainedUV = new Vector2();
 
 	/**
 	 * Solve the Inverse Kinematics (IK) problem using the FABRIK algorithm in two dimensions.
@@ -1047,24 +1058,15 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 * Clone and return the IK Chain of this FabrikChain2D, that is, the Vector of FabrikBone2D objects.
 	 * <p>
 	 * This does not clone the entire FabrikChain2D object, only its IK chain.
-	 *
-	 * @return The clones list of FabrikBone2D objects
 	 */
-	private Array<FabrikBone2D> cloneChainVector() {
-		// How many bones are in this chain?
-		int numBones = chain.size;
+	private void cloneChainVector(Array<FabrikBone2D> out) {
 
-		// Create a new Vector of FabrikBone2D objects large enough to contain all the bones in this chain
-		Array<FabrikBone2D> clonedChain = new Array<>(numBones);
+		if(out.size != chain.size)
+			throw new IllegalArgumentException("Provided out array must contain same number of bone as chain");
 
-		// For each bone in the chain being cloned...		
-		for(FabrikBone2D fabrikBone2D : chain) {
-			// ...use the FabrikBone2D copy constructor to create a new FabrikBone2D with the properties as set from the source bone
-			// and add it to the cloned chain
-			clonedChain.add(new FabrikBone2D(fabrikBone2D));
-		}
-
-		return clonedChain;
+		int i = 0;
+		for(FabrikBone2D fabrikBone2D : chain)
+			out.get(i++).set(fabrikBone2D);
 	}
 
 	/***
@@ -1166,6 +1168,14 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 		return solveForTarget(newTarget.x, newTarget.y);
 	}
 
+	private void ensureChainSize(Array<FabrikBone2D> array) {
+		while(array.size < this.chain.size)
+			array.add(new FabrikBone2D());
+
+		while(array.size > chain.size)
+			array.removeIndex(array.size - 1);
+	}
+
 	/**
 	 * Solve the IK chain for this target to the best of our ability.
 	 * <p>
@@ -1189,26 +1199,26 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 	 */
 	public float solveForTarget(float targetX, float targetY) {
 		// Same target as before? Abort immediately and save ourselves some cycles
-		if(lastTargetLocation.epsilonEquals(targetX, targetY, 0.001f) && lastBaseLocation.epsilonEquals(baseLocation, 0.001f)) {
+		if(lastTargetLocation.epsilonEquals(targetX, targetY, 0.001f)
+				&& lastBaseLocation.epsilonEquals(baseLocation, 0.001f)) {
 			return currentSolveDistance;
 		}
 
+		ensureChainSize(tmpBestSolution);
+		ensureChainSize(tmpStartSolution);
+
 		// Keep starting solutions and distance
 		float startingDistance;
-		Array<FabrikBone2D> startingSolution = null;
+
+		cloneChainVector(tmpStartSolution);
 
 		// If the base location of a chain hasn't moved then we may opt to keep the current solution if our 
 		// best new solution is worse...
 		if(lastBaseLocation.epsilonEquals(baseLocation, 0.001f)) {
 			startingDistance = chain.get(chain.size - 1).getEndLocation().dst(targetX, targetY);
-			startingSolution = this.cloneChainVector();
 		} else { // Base has changed? Then we have little choice but to recalc the solution and take that new solution.
 			startingDistance = Float.MAX_VALUE;
 		}
-
-		// Not the same target? Then we must solve the chain for the new target.
-		// We'll start by creating a list of bones to store our best solution
-		Array<FabrikBone2D> bestSolution = new Array<>(this.chain.size);
 
 		// We'll keep track of our best solve distance, starting it at a huge value which will be beaten on first attempt			
 		float bestSolveDistance = Float.MAX_VALUE;
@@ -1224,7 +1234,7 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 			// update our last pass solve distance. Note: We will ALWAYS beat our last solve distance on the first run. 
 			if(solveDistance < bestSolveDistance) {
 				bestSolveDistance = solveDistance;
-				bestSolution = this.cloneChainVector();
+				cloneChainVector(tmpBestSolution);
 
 				// Did we solve for distance? Great! Break out of the loop.
 				if(solveDistance <= solveDistanceThreshold) {
@@ -1246,12 +1256,12 @@ public class FabrikChain2D implements FabrikChain<FabrikBone2D,
 		if(bestSolveDistance < startingDistance) {
 			// If so, set the newly found solve distance and solution as the best found.
 			currentSolveDistance = bestSolveDistance;
-			chain.clear();
-			chain.addAll(bestSolution);
+			for(int i = 0; i < chain.size; i++)
+				chain.get(i).set(tmpBestSolution.get(i));
 		} else { // Did we make things worse? Then we keep our starting distance and solution!
 			currentSolveDistance = startingDistance;
-			chain.clear();
-			chain.addAll(startingSolution);
+			for(int i = 0; i < chain.size; i++)
+				chain.get(i).set(tmpStartSolution.get(i));
 		}
 
 		// Update our last base and target locations so we know whether we need to solve for this start/end configuration next time

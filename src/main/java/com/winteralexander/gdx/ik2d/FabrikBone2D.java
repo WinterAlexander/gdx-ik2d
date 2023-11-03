@@ -190,6 +190,10 @@ public class FabrikBone2D implements FabrikBone<Vector2, FabrikJoint2D> {
 	 * @param source The FabrikBone2D to clone.
 	 */
 	public FabrikBone2D(FabrikBone2D source) {
+		set(source);
+	}
+
+	public void set(FabrikBone2D source) {
 		startLoc.set(source.startLoc);
 		endLoc.set(source.endLoc);
 		joint.set(source.joint);
@@ -393,19 +397,10 @@ public class FabrikBone2D implements FabrikBone<Vector2, FabrikJoint2D> {
 			return false;
 		}
 		FabrikBone2D other = (FabrikBone2D)obj;
-		if(!endLoc.equals(other.endLoc)) {
-			return false;
-		}
-		if(!joint.equals(other.joint)) {
-			return false;
-		}
-		if(Float.floatToIntBits(length) != Float.floatToIntBits(other.length)) {
-			return false;
-		}
-		if(!startLoc.equals(other.startLoc)) {
-			return false;
-		}
-		return true;
+		return endLoc.equals(other.endLoc)
+				&& joint.equals(other.joint)
+				&& Float.floatToIntBits(length) == Float.floatToIntBits(other.length)
+				&& startLoc.equals(other.startLoc);
 	}
 
 } // End of FabrikBone2D class
