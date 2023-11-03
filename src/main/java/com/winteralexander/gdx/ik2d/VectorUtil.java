@@ -14,6 +14,9 @@ public class VectorUtil {
 
 	public static float getSignedAngleDegsTo(Vector2 first, Vector2 second)
 	{
+		if(first.len2() == 0.0f || second.len2() == 0.0f)
+			return 0.0f;
+
 		// Normalise the vectors that we're going to use
 		if(Math.abs(first.len2() - 1.0) > MathUtils.FLOAT_ROUNDING_ERROR)
 			throw new IllegalArgumentException("first argument to getSignedAngleDegsTo is not unit length");
