@@ -4,17 +4,15 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.winteralexander</groupId>
   <artifactId>gdx-ik2d</artifactId>
-  <version>2.0.0</version>
+  <version>0.0.0</version>
   <packaging>jar</packaging>
   <name>gdx-ik2d</name>
   
   <dependencies>
-
-    <!-- https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx -->
     <dependency>
       <groupId>com.badlogicgames.gdx</groupId>
       <artifactId>gdx</artifactId>
-      <version>[1.13.0, 1.14.0)</version>
+      <version>[1.14.0, 1.15.0)</version>
     </dependency>
   </dependencies>
 
